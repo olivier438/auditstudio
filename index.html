@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audit Studio — AI-Powered Compliance Audit</title>
+<title>Audit Studio - AI-Powered Compliance Audit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -904,7 +904,7 @@
 <div class="screen active" id="screen-welcome">
   <div class="welcome-hero">
     <h1>AI-Powered<br><em>Compliance Audit</em></h1>
-    <p>An intelligent audit engine that adapts in real time — asking only what matters, explaining every decision.</p>
+    <p>An intelligent audit engine that adapts in real time - asking only what matters, explaining every decision.</p>
     <div class="framework-badge">
       <div class="dot"></div>
       NIS2 · CyFun Essential · 218 Requirements
@@ -920,7 +920,7 @@
       <div class="form-group">
         <label class="form-label">Groq API Key <span style="color:var(--orange)">*</span></label>
         <input type="password" class="form-input" id="groq-api-key" placeholder="gsk_..." autocomplete="off" />
-        <span style="font-size:11px;color:var(--text-light)">Never stored — session only. Get yours at console.groq.com</span>
+        <span style="font-size:11px;color:var(--text-light)">Never stored - session only. Get yours at console.groq.com</span>
       </div>
       <div class="form-group">
         <label class="form-label">Organization Name <span style="font-weight:400;color:var(--text-light);text-transform:none;letter-spacing:0">(optional)</span></label>
@@ -946,7 +946,7 @@
         <label class="form-label">Organization Size</label>
         <select class="form-input form-select" id="org-size">
           <option value="SME (< 250 employees)">SME (&lt; 250 employees)</option>
-          <option value="Mid-size (250–1000)">Mid-size (250–1000)</option>
+          <option value="Mid-size (250-1000)">Mid-size (250-1000)</option>
           <option value="Large (1000+)">Large (1000+)</option>
         </select>
       </div>
@@ -956,7 +956,7 @@
           <div class="lbl">Requirements</div>
         </div>
         <div class="info-item">
-          <div class="val">20–46</div>
+          <div class="val">20-46</div>
           <div class="lbl">AI Questions</div>
       </div>
       <div style="font-size:12px;color:var(--text-muted);text-align:center;grid-column:1/-1;margin-top:-4px">218 requirements covered through 20 to 46 adaptive AI questions</div>
@@ -1054,19 +1054,19 @@
     <div class="results-meta">
       <div class="results-meta-item">
         <span class="label">Organization</span>
-        <span class="value" id="res-org">—</span>
+        <span class="value" id="res-org">-</span>
       </div>
       <div class="results-meta-item">
         <span class="label">Sector</span>
-        <span class="value" id="res-sector">—</span>
+        <span class="value" id="res-sector">-</span>
       </div>
       <div class="results-meta-item">
         <span class="label">Questions Asked</span>
-        <span class="value" id="res-questions">—</span>
+        <span class="value" id="res-questions">-</span>
       </div>
       <div class="results-meta-item">
         <span class="label">Date</span>
-        <span class="value" id="res-date">—</span>
+        <span class="value" id="res-date">-</span>
       </div>
     </div>
   </div>
@@ -1119,7 +1119,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────
-const GROQ_KEY = () => document.getElementById('groq-api-key').value.trim();
+const GROQ_KEY = () => document.getElementById('groq-api-key').value.trim().replace(/[^ -~]/g, '');
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 // ── STATE ────────────────────────────────────────────────────────────────
@@ -1165,7 +1165,7 @@ function initNistScores() {
     <div class="nist-score-item">
       <div class="nist-score-label">
         <span class="nist-score-name">${fn}</span>
-        <span class="nist-score-val" id="ns-val-${fn}">—</span>
+        <span class="nist-score-val" id="ns-val-${fn}">-</span>
       </div>
       <div class="nist-bar-wrap">
         <div class="nist-bar-fill" id="ns-bar-${fn}" style="width:0%;background:${NIST_COLORS[fn]}"></div>
@@ -1179,7 +1179,7 @@ function updateNistScores() {
     const el_val = document.getElementById(`ns-val-${fn}`);
     const el_bar = document.getElementById(`ns-bar-${fn}`);
     if (!el_val || !el_bar) return;
-    if (scores.length === 0) { el_val.textContent = '—'; el_bar.style.width = '0%'; return; }
+    if (scores.length === 0) { el_val.textContent = '-'; el_bar.style.width = '0%'; return; }
     const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
     const pct = Math.round((avg / 3) * 100);
     el_val.textContent = pct + '%';
@@ -1383,7 +1383,7 @@ function renderHistory() {
   container.innerHTML = [...state.answers].reverse().slice(0, 5).map(a => `
     <div class="history-item">
       <div class="history-q">${a.question}</div>
-      <div class="history-a">L${a.score} — ${a.answer_text.substring(0, 60)}${a.answer_text.length > 60 ? '...' : ''}</div>
+      <div class="history-a">L${a.score} - ${a.answer_text.substring(0, 60)}${a.answer_text.length > 60 ? '...' : ''}</div>
     </div>
   `).join('');
 }
@@ -1548,7 +1548,7 @@ function renderResults({ overallPct, nistPcts, basicPct, importantPct, essential
 // ── EXPORT ────────────────────────────────────────────────────────────────
 function exportResults() {
   const lines = [
-    `AUDIT STUDIO — NIS2 / CyFun Essential Self-Assessment`,
+    `AUDIT STUDIO - NIS2 / CyFun Essential Self-Assessment`,
     `Generated by ONE CIRCLE IT SOLUTIONS`,
     `Date: ${new Date().toLocaleDateString('en-BE')}`,
     ``,
