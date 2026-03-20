@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Studio — AI-Powered Compliance Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1A5094;
+    --blue-light: #2466b8;
+    --blue-dark: #0f2f5a;
+    --orange: #E8641A;
+    --orange-light: #f07840;
+    --gold: #F0B400;
+    --charcoal: #2C2C2C;
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f8f9fb;
+    --border: #e2e7ef;
+    --text: #1a1f2e;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --success: #16a34a;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 16px rgba(26,80,148,0.08);
+    --shadow-lg: 0 8px 40px rgba(26,80,148,0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--blue-dark);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--orange);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--orange);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    color: white; font-size: 16px; font-weight: bold;
+  }
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+  }
+  .logo-text span { color: var(--orange); }
+  .header-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    background: rgba(240,180,0,0.12);
+    border: 1px solid rgba(240,180,0,0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── WELCOME SCREEN ── */
+  #screen-welcome {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 0 2rem;
+  }
+
+  .welcome-hero {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .welcome-hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px;
+    color: var(--blue-dark);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .welcome-hero h1 em {
+    font-style: italic;
+    color: var(--orange);
+  }
+  .welcome-hero p {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .framework-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 20px 0;
+    letter-spacing: 0.04em;
+  }
+  .framework-badge .dot {
+    width: 7px; height: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .welcome-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .welcome-card-header {
+    background: var(--blue);
+    padding: 20px 28px;
+    color: white;
+  }
+  .welcome-card-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .welcome-card-header p {
+    font-size: 13px;
+    opacity: 0.75;
+  }
+  .welcome-card-body {
+    padding: 28px;
+    display: grid;
+    gap: 20px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .form-input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    background: var(--surface2);
+    transition: all 0.2s;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--blue);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(26,80,148,0.1);
+  }
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .info-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-align: center;
+  }
+  .info-item .val {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .info-item .lbl {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .btn-start {
+    width: 100%;
+    padding: 16px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-start:hover { background: var(--orange-light); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(232,100,26,0.3); }
+  .btn-start:active { transform: translateY(0); }
+  .btn-start:disabled { background: var(--text-light); cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── AUDIT SCREEN ── */
+  #screen-audit {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 2rem;
+    display: none;
+  }
+  #screen-audit.active { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+
+  /* Progress bar */
+  .audit-progress {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .progress-info { flex: 1; }
+  .progress-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .progress-bar-wrap {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--orange));
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+  .progress-stats {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .progress-stat {
+    text-align: center;
+  }
+  .progress-stat .n {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    color: var(--blue);
+    font-weight: 500;
+  }
+  .progress-stat .l {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .nist-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .nist-IDENTIFY { background: #dbeafe; color: #1e40af; }
+  .nist-PROTECT  { background: #dcfce7; color: #15803d; }
+  .nist-DETECT   { background: #fef9c3; color: #a16207; }
+  .nist-RESPOND  { background: #fee2e2; color: #b91c1c; }
+  .nist-RECOVER  { background: #f3e8ff; color: #7e22ce; }
+
+  /* Question card */
+  .question-col { display: flex; flex-direction: column; gap: 16px; }
+
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: slideIn 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-header {
+    background: var(--blue);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .question-num {
+    font-family: 'DM Mono', monospace;
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+  .question-domain {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+  }
+
+  .question-body { padding: 24px; }
+  .question-text {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+
+  .answer-options { display: flex; flex-direction: column; gap: 10px; }
+  .answer-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--surface2);
+  }
+  .answer-opt:hover { border-color: var(--blue); background: #f0f5fb; }
+  .answer-opt.selected {
+    border-color: var(--blue);
+    background: #e8f0fb;
+  }
+  .answer-opt input[type="radio"] { display: none; }
+  .opt-indicator {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+  }
+  .answer-opt.selected .opt-indicator {
+    border-color: var(--blue);
+    background: var(--blue);
+  }
+  .answer-opt.selected .opt-indicator::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: white;
+    border-radius: 50%;
+  }
+  .opt-level {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .level-0 { background: #fee2e2; color: #b91c1c; }
+  .level-1 { background: #ffedd5; color: #c2410c; }
+  .level-2 { background: #fef9c3; color: #a16207; }
+  .level-3 { background: #dcfce7; color: #15803d; }
+  .opt-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .btn-next {
+    width: 100%;
+    padding: 14px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 20px;
+  }
+  .btn-next:hover { background: var(--blue-light); }
+  .btn-next:disabled { background: var(--border); color: var(--text-light); cursor: not-allowed; }
+
+  /* AI Panel */
+  .ai-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .ai-thinking {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .ai-thinking-header {
+    background: var(--charcoal);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ai-pulse {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
+  }
+  .ai-thinking-header span {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .ai-thinking-body {
+    padding: 16px;
+    min-height: 80px;
+  }
+  .ai-reasoning {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .ai-reasoning.loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-light);
+  }
+  .ai-dots span {
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: var(--text-light);
+    border-radius: 50%;
+    animation: dot-bounce 1.2s infinite;
+  }
+  .ai-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .ai-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot-bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40%           { transform: translateY(-6px); }
+  }
+
+  .ai-skip-notice {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Score tracker */
+  .score-tracker {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+  .score-tracker-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+  .nist-scores { display: flex; flex-direction: column; gap: 10px; }
+  .nist-score-item { }
+  .nist-score-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .nist-score-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .nist-score-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .nist-bar-wrap {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .nist-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* History */
+  .audit-history {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .audit-history-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+  .history-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-q {
+    color: var(--text-muted);
+    margin-bottom: 3px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .history-a {
+    font-weight: 600;
+    color: var(--blue);
+  }
+
+  /* ── LOADING OVERLAY ── */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,47,90,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(4px);
+  }
+  .loading-overlay.hidden { display: none; }
+  .loading-box {
+    background: white;
+    border-radius: var(--radius);
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+  .loading-spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-size: 15px;
+    color: var(--text-muted);
+  }
+
+  /* ── RESULTS SCREEN ── */
+  #screen-results {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 2rem;
+  }
+
+  .results-header {
+    background: var(--blue-dark);
+    border-radius: var(--radius);
+    padding: 32px;
+    color: white;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .results-header::after {
+    content: '';
+    position: absolute;
+    right: -20px; top: -20px;
+    width: 160px; height: 160px;
+    background: rgba(240,180,0,0.08);
+    border-radius: 50%;
+  }
+  .results-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .results-header p {
+    font-size: 14px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+  }
+  .results-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .results-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .results-meta-item .label {
+    font-size: 10px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .results-meta-item .value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gold);
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .result-card-header {
+    padding: 14px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .result-card-body { padding: 18px; }
+
+  .overall-score {
+    text-align: center;
+    padding: 24px;
+  }
+  .score-ring {
+    width: 100px; height: 100px;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring-bg { stroke: var(--border); }
+  .score-ring-fill {
+    stroke: var(--blue);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1);
+    stroke-dasharray: 283;
+    stroke-dashoffset: 283;
+  }
+  .score-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .score-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--blue);
+  }
+  .score-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .cyfun-levels { display: flex; flex-direction: column; gap: 8px; }
+  .cyfun-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+  }
+  .cyfun-item.achieved { background: #dcfce7; }
+  .cyfun-item.partial  { background: #fef9c3; }
+  .cyfun-item.gap      { background: #fee2e2; }
+  .cyfun-name { font-weight: 600; }
+  .cyfun-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .badge-achieved { background: #16a34a; color: white; }
+  .badge-partial  { background: #ca8a04; color: white; }
+  .badge-gap      { background: #dc2626; color: white; }
+
+  .nist-breakdown { display: flex; flex-direction: column; gap: 12px; }
+  .nist-item-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nist-item-name {
+    width: 80px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .nist-item-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .nist-item-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+    width: 0;
+  }
+  .nist-item-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    width: 36px;
+    text-align: right;
+  }
+
+  .findings-list { display: flex; flex-direction: column; gap: 10px; }
+  .finding-item {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .finding-critical { border-color: #dc2626; background: #fff5f5; }
+  .finding-warning  { border-color: #f59e0b; background: #fffbeb; }
+  .finding-info     { border-color: var(--blue); background: #f0f5fb; }
+  .finding-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .btn-export {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: var(--charcoal);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-export:hover { background: #444; }
+
+  .btn-restart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--blue);
+    border: 2px solid var(--blue);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-restart:hover { background: var(--blue); color: white; }
+
+  .full-assessment {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .full-assessment-header {
+    background: var(--charcoal);
+    padding: 14px 20px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .full-assessment-body {
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Audit<span>Studio</span></div>
+  </div>
+  <div class="header-badge">BETA v0.1 · NIS2/CyFun Essential</div>
+</header>
+
+<!-- Loading -->
+<div class="loading-overlay hidden" id="loading">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loading-text">AI is thinking...</div>
+  </div>
+</div>
+
+<!-- SCREEN 1: Welcome -->
+<div class="screen active" id="screen-welcome">
+  <div class="welcome-hero">
+    <h1>AI-Powered<br><em>Compliance Audit</em></h1>
+    <p>An intelligent audit engine that adapts in real time — asking only what matters, explaining every decision.</p>
+    <div class="framework-badge">
+      <div class="dot"></div>
+      NIS2 · CyFun Essential · 218 Requirements
+    </div>
+  </div>
+
+  <div class="welcome-card">
+    <div class="welcome-card-header">
+      <h2>Start New Audit Session</h2>
+      <p>Configure your organization profile to begin</p>
+    </div>
+    <div class="welcome-card-body">
+      <div class="form-group">
+        <label class="form-label">Organization Name <span style="font-weight:400;color:var(--text-light);text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input type="text" class="form-input" id="org-name" placeholder="e.g. Acme Corporation" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sector (NIS2)</label>
+        <select class="form-input form-select" id="org-sector">
+          <option value="">Select a sector...</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Banking & Finance">Banking & Finance</option>
+          <option value="Transport">Transport</option>
+          <option value="Water & Wastewater">Water & Wastewater</option>
+          <option value="Energy">Energy</option>
+          <option value="Food">Food & Agri</option>
+          <option value="ICT / MSP / MSSP">ICT / MSP / MSSP</option>
+          <option value="Public Administration">Public Administration</option>
+          <option value="Space">Space</option>
+          <option value="Industry & Manufacturing">Industry & Manufacturing</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Organization Size</label>
+        <select class="form-input form-select" id="org-size">
+          <option value="SME (< 250 employees)">SME (&lt; 250 employees)</option>
+          <option value="Mid-size (250–1000)">Mid-size (250–1000)</option>
+          <option value="Large (1000+)">Large (1000+)</option>
+        </select>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="val">218</div>
+          <div class="lbl">Requirements</div>
+        </div>
+        <div class="info-item">
+          <div class="val">20–46</div>
+          <div class="lbl">AI Questions</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;grid-column:1/-1;margin-top:-4px">218 requirements covered through 20 to 46 adaptive AI questions</div>
+      <div style="display:none">
+        </div>
+        <div class="info-item">
+          <div class="val">5</div>
+          <div class="lbl">NIST Functions</div>
+        </div>
+      </div>
+      <button class="btn-start" id="btn-start" onclick="startAudit()">
+        Start AI Audit Session →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Audit -->
+<div class="screen" id="screen-audit">
+  <!-- Progress -->
+  <div class="audit-progress">
+    <div class="progress-info">
+      <div class="progress-label">Audit Progress</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+    <div class="progress-stats">
+      <div class="progress-stat">
+        <div class="n" id="stat-q">1</div>
+        <div class="l">Question</div>
+      </div>
+      <div class="progress-stat">
+        <div class="n" id="stat-remain">~20</div>
+        <div class="l">Remaining</div>
+      </div>
+      <div id="nist-tag-display" class="nist-tag nist-IDENTIFY">IDENTIFY</div>
+    </div>
+  </div>
+
+  <!-- Question col -->
+  <div class="question-col">
+    <div class="question-card" id="question-card">
+      <div class="question-header">
+        <span class="question-num" id="q-num">Q01</span>
+        <span class="question-domain" id="q-domain">GOVERNANCE</span>
+      </div>
+      <div class="question-body">
+        <div class="question-text" id="q-text">Loading question...</div>
+        <div class="answer-options" id="answer-options"></div>
+        <button class="btn-next" id="btn-next" disabled onclick="submitAnswer()">
+          Next Question →
+        </button>
+      </div>
+    </div>
+
+    <div class="audit-history" id="audit-history" style="display:none">
+      <div class="audit-history-title">Answered Questions</div>
+      <div id="history-items"></div>
+    </div>
+  </div>
+
+  <!-- AI panel -->
+  <div class="ai-panel">
+    <div class="ai-thinking">
+      <div class="ai-thinking-header">
+        <div class="ai-pulse"></div>
+        <span>AI Reasoning</span>
+      </div>
+      <div class="ai-thinking-body">
+        <div class="ai-reasoning" id="ai-reasoning">
+          <div class="ai-reasoning loading">
+            <div class="ai-dots">
+              <span></span><span></span><span></span>
+            </div>
+            AI is analyzing context...
+          </div>
+        </div>
+        <div class="ai-skip-notice" id="ai-skip" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="score-tracker">
+      <div class="score-tracker-title">Live Score by NIST Function</div>
+      <div class="nist-scores" id="nist-scores"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: Results -->
+<div class="screen" id="screen-results">
+  <div class="results-header">
+    <h2>Self-Assessment Results</h2>
+    <p id="results-subtitle">NIS2 / CyFun Essential Audit</p>
+    <div class="results-meta">
+      <div class="results-meta-item">
+        <span class="label">Organization</span>
+        <span class="value" id="res-org">—</span>
+      </div>
+      <div class="results-meta-item">
+        <span class="label">Sector</span>
+        <span class="value" id="res-sector">—</span>
+      </div>
+      <div class="results-meta-item">
+        <span class="label">Questions Asked</span>
+        <span class="value" id="res-questions">—</span>
+      </div>
+      <div class="results-meta-item">
+        <span class="label">Date</span>
+        <span class="value" id="res-date">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="result-card-header">Overall Maturity Score</div>
+      <div class="result-card-body">
+        <div class="overall-score">
+          <div class="score-ring">
+            <svg viewBox="0 0 100 100" width="100" height="100">
+              <circle class="score-ring-bg" cx="50" cy="50" r="45" fill="none" stroke-width="8"/>
+              <circle class="score-ring-fill" id="score-ring-fill" cx="50" cy="50" r="45" fill="none" stroke-width="8"/>
+            </svg>
+            <div class="score-ring-text">
+              <div class="score-pct" id="score-pct">0%</div>
+              <div class="score-lbl">Maturity</div>
+            </div>
+          </div>
+        </div>
+        <div class="cyfun-levels" id="cyfun-levels"></div>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-header">Score by NIST Function</div>
+      <div class="result-card-body">
+        <div class="nist-breakdown" id="nist-breakdown"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-card" style="margin-bottom:20px">
+    <div class="result-card-header">Key Findings</div>
+    <div class="result-card-body">
+      <div class="findings-list" id="findings-list"></div>
+    </div>
+  </div>
+
+  <div class="full-assessment">
+    <div class="full-assessment-header">AI-Generated Assessment Summary</div>
+    <div class="full-assessment-body" id="full-assessment-text">Generating...</div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px">
+    <button class="btn-export" onclick="exportResults()">⬇ Export Report</button>
+    <button class="btn-restart" onclick="restartAudit()">↩ New Audit</button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────
+const GROQ_KEY = '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';
+const GROQ_MODEL = 'llama-3.1-70b-versatile';
+
+// ── STATE ────────────────────────────────────────────────────────────────
+let state = {
+  org: '', sector: '', size: '',
+  questionNumber: 0,
+  answers: [],  // [{question, domain, nist_function, answer_text, score}]
+  nistScores: { IDENTIFY: [], PROTECT: [], DETECT: [], RESPOND: [], RECOVER: [] },
+  currentQuestion: null,
+  isComplete: false
+};
+
+// ── HELPERS ──────────────────────────────────────────────────────────────
+function showLoading(text = 'AI is thinking...') {
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('loading-text').textContent = text;
+}
+function hideLoading() {
+  document.getElementById('loading').classList.add('hidden');
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    if (s.id === 'screen-audit') s.style.display = 'none';
+  });
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  if (id === 'screen-audit') el.style.display = 'grid';
+}
+
+// ── NIST COLORS ──────────────────────────────────────────────────────────
+const NIST_COLORS = {
+  IDENTIFY: '#3b82f6',
+  PROTECT:  '#22c55e',
+  DETECT:   '#eab308',
+  RESPOND:  '#ef4444',
+  RECOVER:  '#a855f7'
+};
+
+function initNistScores() {
+  const container = document.getElementById('nist-scores');
+  container.innerHTML = Object.keys(NIST_COLORS).map(fn => `
+    <div class="nist-score-item">
+      <div class="nist-score-label">
+        <span class="nist-score-name">${fn}</span>
+        <span class="nist-score-val" id="ns-val-${fn}">—</span>
+      </div>
+      <div class="nist-bar-wrap">
+        <div class="nist-bar-fill" id="ns-bar-${fn}" style="width:0%;background:${NIST_COLORS[fn]}"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateNistScores() {
+  Object.entries(state.nistScores).forEach(([fn, scores]) => {
+    const el_val = document.getElementById(`ns-val-${fn}`);
+    const el_bar = document.getElementById(`ns-bar-${fn}`);
+    if (!el_val || !el_bar) return;
+    if (scores.length === 0) { el_val.textContent = '—'; el_bar.style.width = '0%'; return; }
+    const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
+    const pct = Math.round((avg / 3) * 100);
+    el_val.textContent = pct + '%';
+    el_bar.style.width = pct + '%';
+  });
+}
+
+// ── GROQ API ─────────────────────────────────────────────────────────────
+async function callGroq(messages) {
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${GROQ_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages,
+      temperature: 0.3,
+      max_tokens: 1200
+    })
+  });
+  if (!resp.ok) throw new Error('Groq API error: ' + resp.status);
+  const data = await resp.json();
+  return data.choices[0].message.content;
+}
+
+// ── SYSTEM PROMPT ─────────────────────────────────────────────────────────
+function getSystemPrompt() {
+  return `You are an expert NIS2/CyFun Essential auditor conducting an adaptive compliance assessment. 
+
+FRAMEWORK: NIS2 / CyFun Essential (218 requirements, 3 levels: Basic, Important, Essential)
+NIST CSF FUNCTIONS: IDENTIFY, PROTECT, DETECT, RESPOND, RECOVER
+
+Your role is to conduct an intelligent, adaptive audit by:
+1. Asking targeted questions that cover the 5 NIST CSF domains
+2. Skipping irrelevant questions based on previous answers
+3. Deepening investigation in weak areas
+4. Completing the audit in approximately 15-22 questions
+
+ANSWER OPTIONS: Always provide exactly 4 answer options:
+- Level 0: Not implemented / No process in place
+- Level 1: Initial / Ad-hoc, informal
+- Level 2: Defined / Documented but not fully applied
+- Level 3: Managed / Fully applied and monitored
+
+RESPONSE FORMAT: Always respond ONLY with valid JSON, no extra text:
+{
+  "question": "The question text (clear, specific, practical)",
+  "domain": "Short domain name (e.g. GOVERNANCE, ACCESS CONTROL, INCIDENT RESPONSE...)",
+  "nist_function": "IDENTIFY|PROTECT|DETECT|RESPOND|RECOVER",
+  "reasoning": "2-3 sentences explaining WHY you chose this question now, what previous answers influenced this, and what you expect to learn",
+  "skip_notice": "If you skipped areas, explain briefly which and why (or null)",
+  "options": [
+    {"level": 0, "text": "..."},
+    {"level": 1, "text": "..."},
+    {"level": 2, "text": "..."},
+    {"level": 3, "text": "..."}
+  ],
+  "estimated_remaining": 18,
+  "is_complete": false
+}
+
+When the audit has sufficient coverage (typically 15-22 questions), set is_complete to true and provide a completion message in the question field.`;
+}
+
+function buildAuditContext() {
+  const answeredStr = state.answers.map((a, i) =>
+    `Q${i+1} [${a.nist_function} / ${a.domain}]: ${a.question}\nAnswer: ${a.answer_text} (Level ${a.score}/3)`
+  ).join('\n\n');
+
+  return `Organization: ${state.org}
+Sector: ${state.sector}
+Size: ${state.size}
+Framework: NIS2 / CyFun Essential
+
+${state.answers.length > 0 ? 'PREVIOUS Q&A:\n' + answeredStr : 'This is the first question. Start with a high-level governance question.'}
+
+${state.answers.length > 0 ? `Now ask question ${state.questionNumber + 1}. Adapt based on previous answers.` : ''}`;
+}
+
+// ── START AUDIT ───────────────────────────────────────────────────────────
+async function startAudit() {
+  const org = document.getElementById('org-name').value.trim();
+  const sector = document.getElementById('org-sector').value;
+  const size = document.getElementById('org-size').value;
+  if (!org || !sector) { alert('Please fill in organization name and sector.'); return; }
+
+  state = {
+    org, sector, size,
+    questionNumber: 0,
+    answers: [],
+    nistScores: { IDENTIFY: [], PROTECT: [], DETECT: [], RESPOND: [], RECOVER: [] },
+    currentQuestion: null,
+    isComplete: false
+  };
+
+  showLoading('Initializing AI audit session...');
+  try {
+    await loadNextQuestion();
+    showScreen('screen-audit');
+    initNistScores();
+  } catch(e) {
+    hideLoading();
+    alert('Error connecting to AI: ' + e.message);
+  }
+  hideLoading();
+}
+
+// ── LOAD QUESTION ─────────────────────────────────────────────────────────
+async function loadNextQuestion() {
+  state.questionNumber++;
+  const messages = [
+    { role: 'system', content: getSystemPrompt() },
+    { role: 'user', content: buildAuditContext() }
+  ];
+
+  const raw = await callGroq(messages);
+  let q;
+  try {
+    const clean = raw.replace(/```json|```/g, '').trim();
+    q = JSON.parse(clean);
+  } catch(e) {
+    throw new Error('Invalid AI response format');
+  }
+
+  state.currentQuestion = q;
+
+  if (q.is_complete) {
+    await generateResults();
+    return;
+  }
+
+  renderQuestion(q);
+}
+
+// ── RENDER QUESTION ───────────────────────────────────────────────────────
+function renderQuestion(q) {
+  document.getElementById('q-num').textContent = `Q${String(state.questionNumber).padStart(2,'0')}`;
+  document.getElementById('q-domain').textContent = q.domain;
+  document.getElementById('q-text').textContent = q.question;
+
+  // NIST tag
+  const tag = document.getElementById('nist-tag-display');
+  tag.textContent = q.nist_function;
+  tag.className = `nist-tag nist-${q.nist_function}`;
+
+  // Progress
+  const estimated_total = state.questionNumber + (q.estimated_remaining || 15);
+  const pct = Math.min(95, Math.round((state.questionNumber / estimated_total) * 100));
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('stat-q').textContent = state.questionNumber;
+  document.getElementById('stat-remain').textContent = q.estimated_remaining || '~';
+
+  // AI reasoning
+  document.getElementById('ai-reasoning').innerHTML = `<em>${q.reasoning}</em>`;
+  const skipEl = document.getElementById('ai-skip');
+  if (q.skip_notice) {
+    skipEl.style.display = 'block';
+    skipEl.textContent = '⤵ ' + q.skip_notice;
+  } else {
+    skipEl.style.display = 'none';
+  }
+
+  // Options
+  const optContainer = document.getElementById('answer-options');
+  optContainer.innerHTML = q.options.map((opt, i) => `
+    <label class="answer-opt" id="opt-${i}" onclick="selectOption(${i}, ${opt.level}, ${JSON.stringify(opt.text).replace(/'/g,"&#39;")})">
+      <input type="radio" name="answer" value="${i}">
+      <div class="opt-indicator" id="opt-ind-${i}"></div>
+      <div class="opt-level level-${opt.level}">L${opt.level}</div>
+      <div class="opt-text">${opt.text}</div>
+    </label>
+  `).join('');
+
+  document.getElementById('btn-next').disabled = true;
+
+  // History
+  if (state.answers.length > 0) {
+    document.getElementById('audit-history').style.display = 'block';
+    renderHistory();
+  }
+
+  // Animate card
+  const card = document.getElementById('question-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'slideIn 0.35s cubic-bezier(0.4,0,0.2,1)';
+}
+
+function selectOption(idx, level, text) {
+  document.querySelectorAll('.answer-opt').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+  state.selectedAnswer = { level, text, idx };
+  document.getElementById('btn-next').disabled = false;
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-items');
+  container.innerHTML = [...state.answers].reverse().slice(0, 5).map(a => `
+    <div class="history-item">
+      <div class="history-q">${a.question}</div>
+      <div class="history-a">L${a.score} — ${a.answer_text.substring(0, 60)}${a.answer_text.length > 60 ? '...' : ''}</div>
+    </div>
+  `).join('');
+}
+
+// ── SUBMIT ANSWER ─────────────────────────────────────────────────────────
+async function submitAnswer() {
+  if (!state.selectedAnswer) return;
+  const q = state.currentQuestion;
+
+  state.answers.push({
+    question: q.question,
+    domain: q.domain,
+    nist_function: q.nist_function,
+    answer_text: state.selectedAnswer.text,
+    score: state.selectedAnswer.level
+  });
+
+  state.nistScores[q.nist_function].push(state.selectedAnswer.level);
+  updateNistScores();
+  state.selectedAnswer = null;
+
+  showLoading('AI is analyzing your answer...');
+  try {
+    await loadNextQuestion();
+  } catch(e) {
+    hideLoading();
+    alert('AI error: ' + e.message);
+  }
+  hideLoading();
+}
+
+// ── GENERATE RESULTS ──────────────────────────────────────────────────────
+async function generateResults() {
+  showLoading('Generating self-assessment report...');
+
+  // Compute scores
+  const allScores = state.answers.map(a => a.score);
+  const overall = allScores.length ? allScores.reduce((a,b) => a+b,0) / allScores.length : 0;
+  const overallPct = Math.round((overall / 3) * 100);
+
+  const nistPcts = {};
+  Object.entries(state.nistScores).forEach(([fn, scores]) => {
+    nistPcts[fn] = scores.length ? Math.round((scores.reduce((a,b)=>a+b,0)/scores.length/3)*100) : 0;
+  });
+
+  // CyFun levels
+  const basicPct = overallPct;
+  const importantPct = Math.max(0, overallPct - 15);
+  const essentialPct = Math.max(0, overallPct - 30);
+
+  // Generate AI summary
+  const summaryPrompt = `You are an expert NIS2/CyFun auditor. Generate a concise self-assessment summary based on this audit.
+
+Organization: ${state.org}
+Sector: ${state.sector}
+Overall maturity: ${overallPct}%
+NIST Function scores: ${Object.entries(nistPcts).map(([k,v]) => `${k}: ${v}%`).join(', ')}
+
+All Q&A:
+${state.answers.map((a,i) => `Q${i+1} [${a.nist_function}/${a.domain}]: ${a.question}\nAnswer (L${a.score}/3): ${a.answer_text}`).join('\n\n')}
+
+Write a 250-300 word professional self-assessment summary including:
+1. Overall maturity posture
+2. Key strengths (2-3)
+3. Critical gaps requiring immediate attention (2-3)
+4. Priority recommendations
+Use clear, direct language appropriate for a CISO or executive audience.`;
+
+  let summaryText = '';
+  try {
+    summaryText = await callGroq([
+      { role: 'system', content: 'You are an expert NIS2 auditor. Write professional, concise reports.' },
+      { role: 'user', content: summaryPrompt }
+    ]);
+  } catch(e) {
+    summaryText = 'Error generating AI summary. Please review the scores above.';
+  }
+
+  // Identify key findings
+  const criticalDomains = state.answers.filter(a => a.score <= 1).map(a => a.domain);
+  const weakDomains = state.answers.filter(a => a.score === 2).map(a => a.domain);
+  const strongDomains = state.answers.filter(a => a.score === 3).map(a => a.domain);
+
+  hideLoading();
+  renderResults({ overallPct, nistPcts, basicPct, importantPct, essentialPct, summaryText, criticalDomains, weakDomains, strongDomains });
+  showScreen('screen-results');
+}
+
+function renderResults({ overallPct, nistPcts, basicPct, importantPct, essentialPct, summaryText, criticalDomains, weakDomains, strongDomains }) {
+  document.getElementById('res-org').textContent = state.org;
+  document.getElementById('res-sector').textContent = state.sector;
+  document.getElementById('res-questions').textContent = state.answers.length;
+  document.getElementById('res-date').textContent = new Date().toLocaleDateString('en-BE');
+
+  // Score ring
+  document.getElementById('score-pct').textContent = overallPct + '%';
+  const circumference = 283;
+  const offset = circumference - (circumference * overallPct / 100);
+  setTimeout(() => {
+    const fill = document.getElementById('score-ring-fill');
+    fill.style.strokeDashoffset = offset;
+    const color = overallPct >= 70 ? '#16a34a' : overallPct >= 40 ? '#f59e0b' : '#dc2626';
+    fill.style.stroke = color;
+    document.getElementById('score-pct').style.color = color;
+  }, 100);
+
+  // CyFun levels
+  const cyfunEl = document.getElementById('cyfun-levels');
+  cyfunEl.innerHTML = [
+    { name: 'Basic Level', pct: basicPct },
+    { name: 'Important Level', pct: importantPct },
+    { name: 'Essential Level', pct: essentialPct }
+  ].map(item => {
+    const cls = item.pct >= 80 ? 'achieved' : item.pct >= 50 ? 'partial' : 'gap';
+    const badge = item.pct >= 80 ? 'badge-achieved' : item.pct >= 50 ? 'badge-partial' : 'badge-gap';
+    const label = item.pct >= 80 ? 'ACHIEVED' : item.pct >= 50 ? 'PARTIAL' : 'GAP';
+    return `<div class="cyfun-item ${cls}">
+      <span class="cyfun-name">${item.name}</span>
+      <span class="cyfun-badge ${badge}">${label} ${item.pct}%</span>
+    </div>`;
+  }).join('');
+
+  // NIST breakdown
+  const nistEl = document.getElementById('nist-breakdown');
+  nistEl.innerHTML = Object.entries(nistPcts).map(([fn, pct]) => `
+    <div class="nist-item-result">
+      <div class="nist-item-name">${fn}</div>
+      <div class="nist-item-bar">
+        <div class="nist-item-bar-fill" style="background:${NIST_COLORS[fn]}" data-pct="${pct}"></div>
+      </div>
+      <div class="nist-item-pct">${pct}%</div>
+    </div>
+  `).join('');
+  setTimeout(() => {
+    document.querySelectorAll('.nist-item-bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 100);
+
+  // Findings
+  const findingsEl = document.getElementById('findings-list');
+  const findings = [];
+  const uniqueCritical = [...new Set(criticalDomains)].slice(0, 3);
+  const uniqueWeak = [...new Set(weakDomains)].slice(0, 2);
+  const uniqueStrong = [...new Set(strongDomains)].slice(0, 2);
+
+  uniqueCritical.forEach(d => findings.push({ type: 'critical', tag: 'CRITICAL GAP', text: `${d}: No or minimal implementation detected. Immediate remediation required to achieve NIS2 compliance.` }));
+  uniqueWeak.forEach(d => findings.push({ type: 'warning', tag: 'IMPROVEMENT NEEDED', text: `${d}: Partial implementation. Documentation and consistent application required.` }));
+  uniqueStrong.forEach(d => findings.push({ type: 'info', tag: 'STRENGTH', text: `${d}: Good maturity level observed. Maintain and monitor.` }));
+
+  findingsEl.innerHTML = findings.map(f => `
+    <div class="finding-item finding-${f.type}">
+      <div class="finding-tag">${f.tag}</div>
+      ${f.text}
+    </div>
+  `).join('') || '<div style="color:var(--text-muted); font-size:14px">No specific findings generated.</div>';
+
+  // Summary
+  document.getElementById('full-assessment-text').textContent = summaryText;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────
+function exportResults() {
+  const lines = [
+    `AUDIT STUDIO — NIS2 / CyFun Essential Self-Assessment`,
+    `Generated by ONE CIRCLE IT SOLUTIONS`,
+    `Date: ${new Date().toLocaleDateString('en-BE')}`,
+    ``,
+    `ORGANIZATION: ${state.org}`,
+    `SECTOR: ${state.sector}`,
+    ``,
+    `─────────────────────────────────────────`,
+    `QUESTIONS & ANSWERS`,
+    `─────────────────────────────────────────`,
+    ...state.answers.map((a, i) =>
+      `Q${i+1} [${a.nist_function} / ${a.domain}]\n${a.question}\nAnswer (L${a.score}/3): ${a.answer_text}`
+    ).join('\n\n'),
+    ``,
+    `─────────────────────────────────────────`,
+    `AI ASSESSMENT SUMMARY`,
+    `─────────────────────────────────────────`,
+    document.getElementById('full-assessment-text').textContent
+  ].join('\n');
+
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `AuditStudio_${state.org.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function restartAudit() {
+  showScreen('screen-welcome');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+document.getElementById('org-name').addEventListener('input', () => {
+  const ok = document.getElementById('org-sector').value;
+  document.getElementById('btn-start').disabled = !ok;
+});
+document.getElementById('org-sector').addEventListener('change', () => {
+  const ok = document.getElementById('org-sector').value;
+  document.getElementById('btn-start').disabled = !ok;
+});
+document.getElementById('btn-start').disabled = true;
+</script>
+</body>
+</html>
