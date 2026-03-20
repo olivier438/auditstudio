@@ -1353,14 +1353,6 @@ function renderQuestion(q) {
       <div class="opt-text">${opt.text}</div>
     </div>
   `).join('');
-  optContainer.querySelectorAll('.answer-opt').forEach(el => {
-    el.addEventListener('click', () => {
-      const idx = parseInt(el.dataset.idx);
-      const level = parseInt(el.dataset.level);
-      const text = el.querySelector('.opt-text').textContent;
-      selectOption(idx, level, text);
-    });
-  });
 
   document.getElementById('btn-next').disabled = true;
 
@@ -1589,6 +1581,16 @@ function restartAudit() {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
+// Delegated click on answer options
+document.addEventListener('click', function(e) {
+  const opt = e.target.closest('.answer-opt');
+  if (!opt) return;
+  const idx = parseInt(opt.dataset.idx);
+  const level = parseInt(opt.dataset.level);
+  const text = opt.querySelector('.opt-text').textContent;
+  selectOption(idx, level, text);
+});
+
 document.getElementById('org-name').addEventListener('input', () => {
   const ok = document.getElementById('org-sector').value && document.getElementById('groq-api-key').value.trim();
   document.getElementById('btn-start').disabled = !ok;
