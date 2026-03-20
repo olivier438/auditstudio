@@ -1347,13 +1347,20 @@ function renderQuestion(q) {
   // Options
   const optContainer = document.getElementById('answer-options');
   optContainer.innerHTML = q.options.map((opt, i) => `
-    <label class="answer-opt" id="opt-${i}" onclick="selectOption(${i}, ${opt.level}, ${JSON.stringify(opt.text).replace(/'/g,"&#39;")})">
-      <input type="radio" name="answer" value="${i}">
+    <div class="answer-opt" id="opt-${i}" data-idx="${i}" data-level="${opt.level}">
       <div class="opt-indicator" id="opt-ind-${i}"></div>
       <div class="opt-level level-${opt.level}">L${opt.level}</div>
       <div class="opt-text">${opt.text}</div>
-    </label>
+    </div>
   `).join('');
+  optContainer.querySelectorAll('.answer-opt').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.idx);
+      const level = parseInt(el.dataset.level);
+      const text = el.querySelector('.opt-text').textContent;
+      selectOption(idx, level, text);
+    });
+  });
 
   document.getElementById('btn-next').disabled = true;
 
