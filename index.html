@@ -918,11 +918,7 @@
       <p>Configure your organization profile to begin</p>
     </div>
     <div class="welcome-card-body">
-      <div class="form-group">
-        <label class="form-label">Groq API Key <span style="color:var(--orange)">*</span></label>
-        <input type="password" class="form-input" id="groq-api-key" placeholder="gsk_..." autocomplete="off" />
-        <span style="font-size:11px;color:var(--text-light)">Never stored - session only. Get yours at console.groq.com</span>
-      </div>
+
       <div class="form-group">
         <label class="form-label">Organization Name <span style="font-weight:400;color:var(--text-light);text-transform:none;letter-spacing:0">(optional)</span></label>
         <input type="text" class="form-input" id="org-name" placeholder="e.g. Acme Corporation" />
@@ -1120,8 +1116,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────
-const GROQ_KEY = () => document.getElementById('groq-api-key').value.trim().replace(/[^ -~]/g, '');
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const WORKER_URL = 'https://auditstudio-worker.YOUR_SUBDOMAIN.workers.dev';
 
 // ── STATE ────────────────────────────────────────────────────────────────
 let state = {
@@ -1189,110 +1184,29 @@ function updateNistScores() {
 }
 
 // ── GROQ API ─────────────────────────────────────────────────────────────
-async function callGroq(messages) {
-  const maxRetries = 3;
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+async function callWorker(endpoint, body, retries = 3) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    const res = await fetch(WORKER_URL + endpoint, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_KEY()}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages,
-        temperature: 0.3,
-        max_tokens: 1200
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
     });
-    if (resp.status === 429) {
-      if (attempt < maxRetries - 1) {
+    if (res.status === 429) {
+      if (attempt < retries - 1) {
         document.getElementById('loading-text').textContent = 'Rate limit - retrying in 5s...';
         await new Promise(r => setTimeout(r, 5000));
         continue;
       }
+      throw new Error('Rate limit exceeded - please wait a moment');
     }
-    if (!resp.ok) throw new Error('Groq API error: ' + resp.status);
-    const data = await resp.json();
-    return data.choices[0].message.content;
+    if (!res.ok) throw new Error('Worker error: ' + res.status);
+    return res.json();
   }
-  throw new Error('Groq API error: 429 - please wait a moment and try again');
 }
 
-// ── SYSTEM PROMPT ─────────────────────────────────────────────────────────
-function getSystemPrompt() {
-  return `You are an expert NIS2/CyFun Essential auditor conducting an adaptive compliance assessment. 
 
-FRAMEWORK: NIS2 / CyFun Essential (218 requirements, 3 levels: Basic, Important, Essential)
-NIST CSF FUNCTIONS: IDENTIFY, PROTECT, DETECT, RESPOND, RECOVER
 
-Your role is to conduct an intelligent, adaptive audit by:
-1. Asking targeted questions that cover the 5 NIST CSF domains
-2. Skipping irrelevant questions based on previous answers
-3. Deepening investigation in weak areas
-4. Completing the audit in approximately 15-22 questions
 
-ANSWER OPTIONS: Always provide exactly 4 answer options:
-- Level 0: Not implemented / No process in place
-- Level 1: Initial / Ad-hoc, informal
-- Level 2: Defined / Documented but not fully applied
-- Level 3: Managed / Fully applied and monitored
-
-RESPONSE FORMAT: Always respond ONLY with valid JSON, no extra text:
-{
-  "question": "The question text (clear, specific, practical)",
-  "domain": "Short domain name (e.g. GOVERNANCE, ACCESS CONTROL, INCIDENT RESPONSE...)",
-  "nist_function": "IDENTIFY|PROTECT|DETECT|RESPOND|RECOVER",
-  "reasoning": "2-3 sentences explaining WHY you chose this question now, what previous answers influenced this, and what you expect to learn",
-  "skip_notice": "If you skipped areas, explain briefly which and why (or null)",
-  "options": [
-    {"level": 0, "text": "..."},
-    {"level": 1, "text": "..."},
-    {"level": 2, "text": "..."},
-    {"level": 3, "text": "..."}
-  ],
-  "estimated_remaining": 18,
-  "is_complete": false
-}
-
-When the audit has sufficient coverage (typically 15-22 questions), set is_complete to true and provide a completion message in the question field.`;
-}
-
-function buildAuditContext() {
-  // Full history compressed - one token per answer
-  const compressedHistory = state.answers.map((a, i) =>
-    `Q${i+1}[${a.nist_function}/${a.domain}]L${a.score}`
-  ).join(' | ');
-
-  // NIST scores with gap flagging
-  const nistSummary = Object.entries(state.nistScores).map(([fn, scores]) => {
-    if (!scores.length) return fn + ':?';
-    const avg = scores.reduce((a,b)=>a+b,0)/scores.length;
-    const flag = avg < 1.5 ? '(!!)' : avg < 2 ? '(!)' : '';
-    return fn + ':' + avg.toFixed(1) + flag;
-  }).join(' | ');
-
-  // Critical gaps to prioritize
-  const gaps = Object.entries(state.nistScores)
-    .filter(([, scores]) => scores.length && scores.reduce((a,b)=>a+b,0)/scores.length < 1.5)
-    .map(([fn]) => fn);
-
-  // Last 5 full answers for immediate context
-  const recentFull = state.answers.slice(-5).map((a, i) => {
-    const idx = state.answers.length - Math.min(5, state.answers.length) + i + 1;
-    return 'Q' + idx + ' [' + a.nist_function + '/' + a.domain + ']: ' + a.question + '\n-> L' + a.score + ': ' + a.answer_text;
-  }).join('\n\n');
-
-  return 'Organization: ' + (state.org || 'Confidential') + ' | Sector: ' + state.sector + ' | Size: ' + state.size + `
-Framework: NIS2/CyFun Essential | Questions answered: ${state.answers.length}
-NIST SCORES: ${nistSummary}
-${gaps.length ? 'CRITICAL GAPS (deepen these): ' + gaps.join(', ') : 'No critical gaps detected yet'}
-${state.answers.length > 0 ? 'FULL HISTORY (compressed): ' + compressedHistory : ''}
-
-${state.answers.length > 0 ? 'LAST 5 ANSWERS (full detail):\n' + recentFull : 'First question: start with governance/security policy.'}
-
-Ask question ${state.questionNumber + 1}. Prioritize critical gaps. Skip already-covered strong areas.`;
-}
 
 // ── START AUDIT ───────────────────────────────────────────────────────────
 async function startAudit() {
@@ -1302,7 +1216,8 @@ async function startAudit() {
   if (!sector) { alert('Please select a sector.'); return; }
 
   state = {
-    org, sector, size,
+    org: org || 'Confidential', sector, size,
+    session_id: null,
     questionNumber: 0,
     answers: [],
     nistScores: { IDENTIFY: [], PROTECT: [], DETECT: [], RESPOND: [], RECOVER: [] },
@@ -1312,6 +1227,9 @@ async function startAudit() {
 
   showLoading('Initializing AI audit session...');
   try {
+    // Create session in Supabase
+    const sessionRes = await callWorker('/api/session', { org_name: org||null, sector, org_size: size });
+    if (sessionRes && sessionRes.session_id) state.session_id = sessionRes.session_id;
     await loadNextQuestion();
     showScreen('screen-audit');
     initNistScores();
@@ -1323,22 +1241,19 @@ async function startAudit() {
 }
 
 // ── LOAD QUESTION ─────────────────────────────────────────────────────────
-async function loadNextQuestion() {
+async function loadNextQuestion(lastAnswer = null) {
   state.questionNumber++;
-  const messages = [
-    { role: 'system', content: getSystemPrompt() },
-    { role: 'user', content: buildAuditContext() }
-  ];
+  const q = await callWorker('/api/question', {
+    session_id: state.session_id,
+    org: state.org,
+    sector: state.sector,
+    size: state.size,
+    question_number: state.questionNumber,
+    answers: state.answers,
+    last_answer: lastAnswer
+  });
 
-  const raw = await callGroq(messages);
-  let q;
-  try {
-    const clean = raw.replace(/```json|```/g, '').trim();
-    q = JSON.parse(clean);
-  } catch(e) {
-    throw new Error('Invalid AI response format');
-  }
-
+  if (q.error) throw new Error(q.error);
   state.currentQuestion = q;
 
   if (q.is_complete) {
@@ -1430,11 +1345,16 @@ async function submitAnswer() {
 
   state.nistScores[q.nist_function].push(state.selectedAnswer.level);
   updateNistScores();
+  const lastAnswer = {
+    question: q.question, domain: q.domain, nist_function: q.nist_function,
+    answer_text: state.selectedAnswer.text, score: state.selectedAnswer.level,
+    reasoning: q.reasoning
+  };
   state.selectedAnswer = null;
 
   showLoading('AI is analyzing your answer...');
   try {
-    await loadNextQuestion();
+    await loadNextQuestion(lastAnswer);
   } catch(e) {
     hideLoading();
     alert('AI error: ' + e.message);
@@ -1481,10 +1401,14 @@ Use clear, direct language appropriate for a CISO or executive audience.`;
 
   let summaryText = '';
   try {
-    summaryText = await callGroq([
-      { role: 'system', content: 'You are an expert NIS2 auditor. Write professional, concise reports.' },
-      { role: 'user', content: summaryPrompt }
-    ]);
+    const res = await callWorker('/api/complete', {
+      session_id: state.session_id,
+      org: state.org,
+      sector: state.sector,
+      answers: state.answers,
+      nistScores: state.nistScores
+    });
+    summaryText = res.summary || 'Error generating summary.';
   } catch(e) {
     summaryText = 'Error generating AI summary. Please review the scores above.';
   }
@@ -1594,122 +1518,71 @@ function getNistAnswers(fn) {
 
 async function exportCCB() {
   const btn = document.getElementById('btn-export');
-  btn.textContent = 'Generating CCB report...';
+  btn.textContent = 'Generating...';
   btn.disabled = true;
 
   try {
-    // Generate per-sheet comments via Groq
-    const sheets = ['GOVERN', 'IDENTIFY', 'PROTECT', 'DETECT', 'RESPOND', 'RECOVER'];
-    const sheetComments = {};
-    const sheetRecs = {};
+    const orgName = state.org || 'Confidential';
 
-    // Map GOVERN to IDENTIFY answers (governance questions)
-    const governAnswers = state.answers.filter(a => a.domain && (a.domain.includes('GOVERN') || a.domain.includes('POLICY') || a.domain.includes('RISK MANAGEMENT') || a.domain.includes('STRATEGY')));
-    const allFunctions = { GOVERN: governAnswers, IDENTIFY: getNistAnswers('IDENTIFY'), PROTECT: getNistAnswers('PROTECT'), DETECT: getNistAnswers('DETECT'), RESPOND: getNistAnswers('RESPOND'), RECOVER: getNistAnswers('RECOVER') };
-
-    for (const sheet of sheets) {
-      const answers = allFunctions[sheet];
-      const fn = sheet === 'GOVERN' ? 'IDENTIFY' : sheet;
-      const avgScore = getNistAvgScore(fn);
-      const answersStr = answers.length > 0
-        ? answers.map(a => `[${a.domain}] L${a.score}: ${a.answer_text}`).join(' | ')
-        : 'No specific answers for this domain - estimated from overall context.';
-
-      try {
-        const prompt = `You are a NIS2/CyFun auditor. For the ${sheet} domain (avg maturity: ${avgScore}/5), write:
-1. A comment (2 sentences max) summarizing the observed situation
-2. A recommendation (2 sentences max) for improvement
-
-Audit context: Organization=${state.org||'Confidential'}, Sector=${state.sector}
-Answers: ${answersStr}
-
-Respond ONLY with JSON: {"comment": "...", "recommendation": "..."}`;
-
-        const raw = await callGroq([
-          { role: 'system', content: 'You are a concise NIS2 auditor. Respond only with valid JSON.' },
-          { role: 'user', content: prompt }
-        ]);
-        const clean = raw.replace(/```json|```/g,'').trim();
-        const parsed = JSON.parse(clean);
-        sheetComments[sheet] = parsed.comment || '';
-        sheetRecs[sheet] = parsed.recommendation || '';
-      } catch(e) {
-        sheetComments[sheet] = 'Assessment based on audit session responses.';
-        sheetRecs[sheet] = 'Review and improve controls in this domain.';
-      }
+    // Score mapping L0-L3 -> CCB 1-5
+    function toCCB(level) { return Math.max(1, Math.min(5, level + 1)); }
+    function getScore(fn) {
+      const scores = state.nistScores[fn] || [];
+      if (!scores.length) return 1;
+      return toCCB(Math.round(scores.reduce((a,b)=>a+b,0)/scores.length));
+    }
+    function getComment(fn, score) {
+      const labels = {1:'No process in place.',2:'Ad-hoc, informal process.',3:'Documented but not fully applied.',4:'Managed and monitored.'};
+      const answers = state.answers.filter(a => a.nist_function === fn);
+      const domains = [...new Set(answers.map(a => a.domain))].join(', ');
+      return `Maturity level ${score}/5. ${labels[score]||''} ${domains ? 'Domains assessed: '+domains+'.' : ''}`.trim();
+    }
+    function getRec(score) {
+      if (score <= 1) return 'Immediate action required. Define and document processes. Assign ownership.';
+      if (score <= 2) return 'Formalize and document existing practices. Ensure management approval.';
+      if (score <= 3) return 'Ensure consistent application. Collect evidence and reduce exceptions.';
+      return 'Maintain current level. Focus on metrics and continuous improvement.';
     }
 
-    // Load CCB template from base64
+    const sheetFnMap = { GOVERN:'IDENTIFY', IDENTIFY:'IDENTIFY', PROTECT:'PROTECT', DETECT:'DETECT', RESPOND:'RESPOND', RECOVER:'RECOVER' };
+    const sheetRows = {
+      GOVERN:   [3,4,5,6],
+      IDENTIFY: [3,4,5,6,7,8,9,10],
+      PROTECT:  [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17],
+      DETECT:   [3,4,5,6],
+      RESPOND:  [3,4],
+      RECOVER:  [3]
+    };
+
     const binaryStr = atob(CCB_TEMPLATE_B64);
     const bytes = new Uint8Array(binaryStr.length);
     for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-    const wb = XLSX.read(bytes, { type: 'array', cellStyles: true, cellFormulas: true });
+    const wb = XLSX.read(bytes, { type: 'array' });
 
-    const today = new Date().toLocaleDateString('en-BE');
-    const orgName = state.org || 'Confidential';
-
-    // Sheet mapping: CCB sheet -> our NIST function
-    const sheetFnMap = { GOVERN: 'IDENTIFY', IDENTIFY: 'IDENTIFY', PROTECT: 'PROTECT', DETECT: 'DETECT', RESPOND: 'RESPOND', RECOVER: 'RECOVER' };
-
-    // Row mapping per sheet (0-indexed row numbers of data rows)
-    const sheetRows = {
-      GOVERN:   [2,3,4,5],
-      IDENTIFY: [2,3,4,5,6,7,8,9],
-      PROTECT:  [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
-      DETECT:   [2,3,4,5],
-      RESPOND:  [2,3],
-      RECOVER:  [2]
-    };
-
-    for (const sheetName of sheets) {
+    for (const [sheetName, fn] of Object.entries(sheetFnMap)) {
       if (!wb.SheetNames.includes(sheetName)) continue;
       const ws = wb.Sheets[sheetName];
-      const fn = sheetFnMap[sheetName];
-      const score = getNistAvgScore(fn);
-      const comment = sheetComments[sheetName] || '';
-      const rec = sheetRecs[sheetName] || '';
+      const score = getScore(fn);
+      const comment = getComment(fn, score);
+      const rec = getRec(score);
       const rows = sheetRows[sheetName] || [];
 
-      // Update date in row 0 col E (cell E1)
-      if (ws['E1']) {
-        ws['E1'].v = today;
-        ws['E1'].t = 's';
+      for (const row of rows) {
+        ws['F'+row] = { v: score, t: 'n' };
+        ws['G'+row] = { v: score, t: 'n' };
+        ws['L'+row] = { v: comment, t: 's' };
+        ws['M'+row] = { v: rec, t: 's' };
       }
-
-      // Update org name if there's a place for it
-      for (const rowIdx of rows) {
-        const excelRow = rowIdx + 1; // 1-indexed
-        const fCell = 'F' + excelRow;
-        const gCell = 'G' + excelRow;
-        const lCell = 'L' + excelRow;
-        const mCell = 'M' + excelRow;
-
-        // Set documentation score
-        if (ws[fCell]) { ws[fCell].v = score; ws[fCell].t = 'n'; }
-        else ws[fCell] = { v: score, t: 'n' };
-
-        // Set implementation score
-        if (ws[gCell]) { ws[gCell].v = score; ws[gCell].t = 'n'; }
-        else ws[gCell] = { v: score, t: 'n' };
-
-        // Set comment
-        if (ws[lCell]) { ws[lCell].v = comment; ws[lCell].t = 's'; }
-        else ws[lCell] = { v: comment, t: 's' };
-
-        // Set assessor recommendation
-        if (ws[mCell]) { ws[mCell].v = rec; ws[mCell].t = 's'; }
-        else ws[mCell] = { v: rec, t: 's' };
-      }
+      // Update date
+      if (ws['E1']) { ws['E1'].v = new Date().toLocaleDateString('en-BE'); ws['E1'].t = 's'; }
     }
 
-    // Write and download
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const safeName = (orgName).replace(/[^a-zA-Z0-9]/g,'_');
-    a.download = 'CyFun_SelfAssessment_' + safeName + '_' + new Date().toISOString().slice(0,10) + '.xlsx';
+    a.download = 'CyFun_SelfAssessment_' + orgName.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.xlsx';
     a.click();
     URL.revokeObjectURL(url);
 
@@ -1738,15 +1611,15 @@ document.getElementById('answer-options').addEventListener('click', function(e) 
 });
 
 document.getElementById('org-name').addEventListener('input', () => {
-  const ok = document.getElementById('org-sector').value && document.getElementById('groq-api-key').value.trim();
+  const ok = document.getElementById('org-sector').value;
   document.getElementById('btn-start').disabled = !ok;
 });
 document.getElementById('org-sector').addEventListener('change', () => {
-  const ok = document.getElementById('org-sector').value && document.getElementById('groq-api-key').value.trim();
+  const ok = document.getElementById('org-sector').value;
   document.getElementById('btn-start').disabled = !ok;
 });
 document.getElementById('groq-api-key').addEventListener('input', () => {
-  const ok = document.getElementById('org-sector').value && document.getElementById('groq-api-key').value.trim();
+  const ok = document.getElementById('org-sector').value;
   document.getElementById('btn-start').disabled = !ok;
 });
 document.getElementById('btn-start').disabled = true;
