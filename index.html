@@ -1189,22 +1189,33 @@ function updateNistScores() {
 
 // ── GROQ API ─────────────────────────────────────────────────────────────
 async function callGroq(messages) {
-  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${GROQ_KEY()}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      messages,
-      temperature: 0.3,
-      max_tokens: 1200
-    })
-  });
-  if (!resp.ok) throw new Error('Groq API error: ' + resp.status);
-  const data = await resp.json();
-  return data.choices[0].message.content;
+  const maxRetries = 3;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_KEY()}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages,
+        temperature: 0.3,
+        max_tokens: 1200
+      })
+    });
+    if (resp.status === 429) {
+      if (attempt < maxRetries - 1) {
+        document.getElementById('loading-text').textContent = 'Rate limit - retrying in 5s...';
+        await new Promise(r => setTimeout(r, 5000));
+        continue;
+      }
+    }
+    if (!resp.ok) throw new Error('Groq API error: ' + resp.status);
+    const data = await resp.json();
+    return data.choices[0].message.content;
+  }
+  throw new Error('Groq API error: 429 - please wait a moment and try again');
 }
 
 // ── SYSTEM PROMPT ─────────────────────────────────────────────────────────
@@ -1247,18 +1258,39 @@ When the audit has sufficient coverage (typically 15-22 questions), set is_compl
 }
 
 function buildAuditContext() {
-  const answeredStr = state.answers.map((a, i) =>
-    `Q${i+1} [${a.nist_function} / ${a.domain}]: ${a.question}\nAnswer: ${a.answer_text} (Level ${a.score}/3)`
-  ).join('\n\n');
+  // Full history compressed - one token per answer
+  const compressedHistory = state.answers.map((a, i) =>
+    `Q${i+1}[${a.nist_function}/${a.domain}]L${a.score}`
+  ).join(' | ');
 
-  return `Organization: ${state.org}
-Sector: ${state.sector}
-Size: ${state.size}
-Framework: NIS2 / CyFun Essential
+  // NIST scores with gap flagging
+  const nistSummary = Object.entries(state.nistScores).map(([fn, scores]) => {
+    if (!scores.length) return fn + ':?';
+    const avg = scores.reduce((a,b)=>a+b,0)/scores.length;
+    const flag = avg < 1.5 ? '(!!)' : avg < 2 ? '(!)' : '';
+    return fn + ':' + avg.toFixed(1) + flag;
+  }).join(' | ');
 
-${state.answers.length > 0 ? 'PREVIOUS Q&A:\n' + answeredStr : 'This is the first question. Start with a high-level governance question.'}
+  // Critical gaps to prioritize
+  const gaps = Object.entries(state.nistScores)
+    .filter(([, scores]) => scores.length && scores.reduce((a,b)=>a+b,0)/scores.length < 1.5)
+    .map(([fn]) => fn);
 
-${state.answers.length > 0 ? `Now ask question ${state.questionNumber + 1}. Adapt based on previous answers.` : ''}`;
+  // Last 5 full answers for immediate context
+  const recentFull = state.answers.slice(-5).map((a, i) => {
+    const idx = state.answers.length - Math.min(5, state.answers.length) + i + 1;
+    return 'Q' + idx + ' [' + a.nist_function + '/' + a.domain + ']: ' + a.question + '\n-> L' + a.score + ': ' + a.answer_text;
+  }).join('\n\n');
+
+  return 'Organization: ' + (state.org || 'Confidential') + ' | Sector: ' + state.sector + ' | Size: ' + state.size + `
+Framework: NIS2/CyFun Essential | Questions answered: ${state.answers.length}
+NIST SCORES: ${nistSummary}
+${gaps.length ? 'CRITICAL GAPS (deepen these): ' + gaps.join(', ') : 'No critical gaps detected yet'}
+${state.answers.length > 0 ? 'FULL HISTORY (compressed): ' + compressedHistory : ''}
+
+${state.answers.length > 0 ? 'LAST 5 ANSWERS (full detail):\n' + recentFull : 'First question: start with governance/security policy.'}
+
+Ask question ${state.questionNumber + 1}. Prioritize critical gaps. Skip already-covered strong areas.`;
 }
 
 // ── START AUDIT ───────────────────────────────────────────────────────────
@@ -1266,7 +1298,7 @@ async function startAudit() {
   const org = document.getElementById('org-name').value.trim();
   const sector = document.getElementById('org-sector').value;
   const size = document.getElementById('org-size').value;
-  if (!org || !sector) { alert('Please fill in organization name and sector.'); return; }
+  if (!sector) { alert('Please select a sector.'); return; }
 
   state = {
     org, sector, size,
