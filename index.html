@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audit Studio - Audit de Conformite</title>
+<title>Audit Studio - Audit de Conformite IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1138,7 +1138,7 @@ let state = {
 };
 
 // ── HELPERS ──────────────────────────────────────────────────────────────
-function showLoading(text = 'L'IA reflechit...') {
+function showLoading(text = "L'IA reflechit...") {
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('loading-text').textContent = text;
 }
@@ -1235,7 +1235,7 @@ async function startAudit() {
     risks: []
   };
 
-  showLoading('Initialisation de la session d'audit IA...');
+  showLoading("Initialisation de la session d'audit IA...");
   try {
     // Create session in Supabase
     const sessionRes = await callWorker('/api/session', { org_name: org||null, sector, org_size: size });
@@ -1369,7 +1369,7 @@ async function submitAnswer() {
   };
   state.selectedAnswer = null;
 
-  showLoading('L'IA analyse votre reponse...');
+  showLoading("L'IA analyse votre reponse...");
   try {
     await loadNextQuestion(lastAnswer);
   } catch(e) {
@@ -1381,7 +1381,7 @@ async function submitAnswer() {
 
 // ── GENERATE RESULTS ──────────────────────────────────────────────────────
 async function generateResults() {
-  showLoading('Generation du rapport d'auto-evaluation...');
+  showLoading("Generation du rapport d'auto-evaluation...");
 
   // Compute scores
   const allScores = state.answers.map(a => a.score);
