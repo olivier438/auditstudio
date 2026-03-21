@@ -1003,6 +1003,7 @@
       </div>
       <div class="question-body">
         <div class="question-text" id="q-text">Loading question...</div>
+        <div id="q-measures" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:12px;display:none"></div>
         <div class="answer-options" id="answer-options"></div>
         <button class="btn-next" id="btn-next" disabled onclick="submitAnswer()">
           Next Question →
@@ -1266,9 +1267,15 @@ async function loadNextQuestion(lastAnswer = null) {
 
 // ── RENDER QUESTION ───────────────────────────────────────────────────────
 function renderQuestion(q) {
-  document.getElementById('q-num').textContent = `Q${String(state.questionNumber).padStart(2,'0')}`;
-  document.getElementById('q-domain').textContent = q.domain;
+  const qRef = q.question_num ? `#${q.question_num}` : `Q${String(state.questionNumber).padStart(2,'0')}`;
+  document.getElementById('q-num').textContent = qRef;
+  document.getElementById('q-domain').textContent = q.domain || '';
   document.getElementById('q-text').textContent = q.question;
+  const measuresEl = document.getElementById('q-measures');
+  if (measuresEl) {
+    measuresEl.textContent = q.cyfun_measures ? 'CyFun: ' + q.cyfun_measures : '';
+    measuresEl.style.display = q.cyfun_measures ? 'block' : 'none';
+  }
 
   // NIST tag
   const tag = document.getElementById('nist-tag-display');
@@ -1336,6 +1343,7 @@ async function submitAnswer() {
   const q = state.currentQuestion;
 
   state.answers.push({
+    question_num: q.question_num || null,
     question: q.question,
     domain: q.domain,
     nist_function: q.nist_function,
