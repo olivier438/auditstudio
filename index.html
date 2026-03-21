@@ -897,7 +897,7 @@
 <div class="loading-overlay hidden" id="loading">
   <div class="loading-box">
     <div class="loading-spinner"></div>
-    <div class="loading-text" id="loading-text">AI is thinking...</div>
+    <div class="loading-text" id="loading-text">L'IA reflechit...</div>
   </div>
 </div>
 
@@ -908,64 +908,64 @@
     <p>An intelligent audit engine that adapts in real time - asking only what matters, explaining every decision.</p>
     <div class="framework-badge">
       <div class="dot"></div>
-      NIS2 · CyFun Essential · 218 Requirements
+      NIS2 · CyFun Essential · 218 Exigences
     </div>
   </div>
 
   <div class="welcome-card">
     <div class="welcome-card-header">
-      <h2>Start New Audit Session</h2>
-      <p>Configure your organization profile to begin</p>
+      <h2>Nouvelle session d'audit</h2>
+      <p>Configurez le profil de votre organisation</p>
     </div>
     <div class="welcome-card-body">
 
       <div class="form-group">
-        <label class="form-label">Organization Name <span style="font-weight:400;color:var(--text-light);text-transform:none;letter-spacing:0">(optional)</span></label>
-        <input type="text" class="form-input" id="org-name" placeholder="e.g. Acme Corporation" />
+        <label class="form-label">Nom de l'organisation <span style="font-weight:400;color:var(--text-light);text-transform:none;letter-spacing:0">(optionnel)</span></label>
+        <input type="text" class="form-input" id="org-name" placeholder="ex. Acme SA" />
       </div>
       <div class="form-group">
-        <label class="form-label">Sector (NIS2)</label>
+        <label class="form-label">Secteur (NIS2)</label>
         <select class="form-input form-select" id="org-sector">
-          <option value="">Select a sector...</option>
-          <option value="Healthcare">Healthcare</option>
+          <option value="">Selectionnez un secteur...</option>
+          <option value="Healthcare">Sante</option>
           <option value="Banking & Finance">Banking & Finance</option>
           <option value="Transport">Transport</option>
           <option value="Water & Wastewater">Water & Wastewater</option>
-          <option value="Energy">Energy</option>
+          <option value="Energy">Energie</option>
           <option value="Food">Food & Agri</option>
           <option value="ICT / MSP / MSSP">ICT / MSP / MSSP</option>
-          <option value="Public Administration">Public Administration</option>
-          <option value="Space">Space</option>
+          <option value="Public Administration">Administration publique</option>
+          <option value="Space">Espace</option>
           <option value="Industry & Manufacturing">Industry & Manufacturing</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Organization Size</label>
+        <label class="form-label">Taille de l'organisation</label>
         <select class="form-input form-select" id="org-size">
-          <option value="SME (< 250 employees)">SME (&lt; 250 employees)</option>
-          <option value="Mid-size (250-1000)">Mid-size (250-1000)</option>
-          <option value="Large (1000+)">Large (1000+)</option>
+          <option value="PME (< 250 employes)">SME (&lt; 250 employees)</option>
+          <option value="Moyenne (250-1000)">Moyenne (250-1000)</option>
+          <option value="Grande (1000+)">Grande (1000+)</option>
         </select>
       </div>
       <div class="info-grid">
         <div class="info-item">
           <div class="val">218</div>
-          <div class="lbl">Requirements</div>
+          <div class="lbl">Exigences</div>
         </div>
         <div class="info-item">
           <div class="val">20-46</div>
-          <div class="lbl">AI Questions</div>
+          <div class="lbl">Questions IA</div>
       </div>
-      <div style="font-size:12px;color:var(--text-muted);text-align:center;grid-column:1/-1;margin-top:-4px">218 requirements covered through 20 to 46 adaptive AI questions</div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;grid-column:1/-1;margin-top:-4px">218 exigences couvertes via 20 a 46 questions adaptatives</div>
       <div style="display:none">
         </div>
         <div class="info-item">
           <div class="val">5</div>
-          <div class="lbl">NIST Functions</div>
+          <div class="lbl">Fonctions NIST</div>
         </div>
       </div>
       <button class="btn-start" id="btn-start" onclick="startAudit()">
-        Start AI Audit Session →
+        Demarrer l'audit IA →
       </button>
     </div>
   </div>
@@ -976,7 +976,7 @@
   <!-- Progress -->
   <div class="audit-progress">
     <div class="progress-info">
-      <div class="progress-label">Audit Progress</div>
+      <div class="progress-label">Progression de l'audit</div>
       <div class="progress-bar-wrap">
         <div class="progress-bar-fill" id="progress-fill"></div>
       </div>
@@ -988,7 +988,7 @@
       </div>
       <div class="progress-stat">
         <div class="n" id="stat-remain">~20</div>
-        <div class="l">Remaining</div>
+        <div class="l">Restantes</div>
       </div>
       <div id="nist-tag-display" class="nist-tag nist-IDENTIFY">IDENTIFY</div>
     </div>
@@ -1002,17 +1002,17 @@
         <span class="question-domain" id="q-domain">GOVERNANCE</span>
       </div>
       <div class="question-body">
-        <div class="question-text" id="q-text">Loading question...</div>
+        <div class="question-text" id="q-text">Chargement...</div>
         <div id="q-measures" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:12px;display:none"></div>
         <div class="answer-options" id="answer-options"></div>
         <button class="btn-next" id="btn-next" disabled onclick="submitAnswer()">
-          Next Question →
+          Question suivante →
         </button>
       </div>
     </div>
 
     <div class="audit-history" id="audit-history" style="display:none">
-      <div class="audit-history-title">Answered Questions</div>
+      <div class="audit-history-title">Questions repondues</div>
       <div id="history-items"></div>
     </div>
   </div>
@@ -1022,7 +1022,7 @@
     <div class="ai-thinking">
       <div class="ai-thinking-header">
         <div class="ai-pulse"></div>
-        <span>AI Reasoning</span>
+        <span>Raisonnement IA</span>
       </div>
       <div class="ai-thinking-body">
         <div class="ai-reasoning" id="ai-reasoning">
@@ -1030,7 +1030,7 @@
             <div class="ai-dots">
               <span></span><span></span><span></span>
             </div>
-            AI is analyzing context...
+            L'IA analyse le contexte...
           </div>
         </div>
         <div class="ai-skip-notice" id="ai-skip" style="display:none"></div>
@@ -1038,7 +1038,7 @@
     </div>
 
     <div class="score-tracker">
-      <div class="score-tracker-title">Live Score by NIST Function</div>
+      <div class="score-tracker-title">Score en temps reel par fonction NIST</div>
       <div class="nist-scores" id="nist-scores"></div>
     </div>
   </div>
@@ -1047,11 +1047,11 @@
 <!-- SCREEN 3: Results -->
 <div class="screen" id="screen-results">
   <div class="results-header">
-    <h2>Self-Assessment Results</h2>
-    <p id="results-subtitle">NIS2 / CyFun Essential Audit</p>
+    <h2>Resultats de l'auto-evaluation</h2>
+    <p id="results-subtitle">Audit NIS2 / CyFun Essential</p>
     <div class="results-meta">
       <div class="results-meta-item">
-        <span class="label">Organization</span>
+        <span class="label">Organisation</span>
         <span class="value" id="res-org">-</span>
       </div>
       <div class="results-meta-item">
@@ -1059,7 +1059,7 @@
         <span class="value" id="res-sector">-</span>
       </div>
       <div class="results-meta-item">
-        <span class="label">Questions Asked</span>
+        <span class="label">Questions posees</span>
         <span class="value" id="res-questions">-</span>
       </div>
       <div class="results-meta-item">
@@ -1071,7 +1071,7 @@
 
   <div class="results-grid">
     <div class="result-card">
-      <div class="result-card-header">Overall Maturity Score</div>
+      <div class="result-card-header">Score de maturite global</div>
       <div class="result-card-body">
         <div class="overall-score">
           <div class="score-ring">
@@ -1081,7 +1081,7 @@
             </svg>
             <div class="score-ring-text">
               <div class="score-pct" id="score-pct">0%</div>
-              <div class="score-lbl">Maturity</div>
+              <div class="score-lbl">Maturite</div>
             </div>
           </div>
         </div>
@@ -1090,7 +1090,7 @@
     </div>
 
     <div class="result-card">
-      <div class="result-card-header">Score by NIST Function</div>
+      <div class="result-card-header">Score par fonction NIST</div>
       <div class="result-card-body">
         <div class="nist-breakdown" id="nist-breakdown"></div>
       </div>
@@ -1098,20 +1098,20 @@
   </div>
 
   <div class="result-card" style="margin-bottom:20px">
-    <div class="result-card-header">Key Findings</div>
+    <div class="result-card-header">Constats cles</div>
     <div class="result-card-body">
       <div class="findings-list" id="findings-list"></div>
     </div>
   </div>
 
   <div class="full-assessment">
-    <div class="full-assessment-header">AI-Generated Assessment Summary</div>
-    <div class="full-assessment-body" id="full-assessment-text">Generating...</div>
+    <div class="full-assessment-header">Resume d'evaluation genere par l'IA</div>
+    <div class="full-assessment-body" id="full-assessment-text">Generation...</div>
   </div>
 
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px">
-    <button class="btn-export" id="btn-export" onclick="exportCCB()">⬇ Export CCB Self-Assessment</button>
-    <button class="btn-restart" onclick="restartAudit()">↩ New Audit</button>
+    <button class="btn-export" id="btn-export" onclick="exportCCB()">⬇ Exporter l'auto-evaluation CCB</button>
+    <button class="btn-restart" onclick="restartAudit()">↩ Nouvel audit</button>
   </div>
 </div>
 
@@ -1130,7 +1130,7 @@ let state = {
 };
 
 // ── HELPERS ──────────────────────────────────────────────────────────────
-function showLoading(text = 'AI is thinking...') {
+function showLoading(text = 'L'IA reflechit...') {
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('loading-text').textContent = text;
 }
@@ -1194,7 +1194,7 @@ async function callWorker(endpoint, body, retries = 3) {
     });
     if (res.status === 429) {
       if (attempt < retries - 1) {
-        document.getElementById('loading-text').textContent = 'Rate limit - retrying in 5s...';
+        document.getElementById('loading-text').textContent = 'Limite atteinte - nouvelle tentative dans 5s...';
         await new Promise(r => setTimeout(r, 5000));
         continue;
       }
@@ -1226,7 +1226,7 @@ async function startAudit() {
     isComplete: false
   };
 
-  showLoading('Initializing AI audit session...');
+  showLoading('Initialisation de la session d'audit IA...');
   try {
     // Create session in Supabase
     const sessionRes = await callWorker('/api/session', { org_name: org||null, sector, org_size: size });
@@ -1360,7 +1360,7 @@ async function submitAnswer() {
   };
   state.selectedAnswer = null;
 
-  showLoading('AI is analyzing your answer...');
+  showLoading('L'IA analyse votre reponse...');
   try {
     await loadNextQuestion(lastAnswer);
   } catch(e) {
@@ -1372,7 +1372,7 @@ async function submitAnswer() {
 
 // ── GENERATE RESULTS ──────────────────────────────────────────────────────
 async function generateResults() {
-  showLoading('Generating self-assessment report...');
+  showLoading('Generation du rapport d'auto-evaluation...');
 
   // Compute scores
   const allScores = state.answers.map(a => a.score);
@@ -1392,7 +1392,7 @@ async function generateResults() {
   // Generate AI summary
   const summaryPrompt = `You are an expert NIS2/CyFun auditor. Generate a concise self-assessment summary based on this audit.
 
-Organization: ${state.org}
+Organisation: ${state.org}
 Sector: ${state.sector}
 Overall maturity: ${overallPct}%
 NIST Function scores: ${Object.entries(nistPcts).map(([k,v]) => `${k}: ${v}%`).join(', ')}
@@ -1418,7 +1418,7 @@ Use clear, direct language appropriate for a CISO or executive audience.`;
     });
     summaryText = res.summary || 'Error generating summary.';
   } catch(e) {
-    summaryText = 'Error generating AI summary. Please review the scores above.';
+    summaryText = 'Erreur de generation du resume. Veuillez consulter les scores ci-dessus.';
   }
 
   // Identify key findings
@@ -1458,7 +1458,7 @@ function renderResults({ overallPct, nistPcts, basicPct, importantPct, essential
   ].map(item => {
     const cls = item.pct >= 80 ? 'achieved' : item.pct >= 50 ? 'partial' : 'gap';
     const badge = item.pct >= 80 ? 'badge-achieved' : item.pct >= 50 ? 'badge-partial' : 'badge-gap';
-    const label = item.pct >= 80 ? 'ACHIEVED' : item.pct >= 50 ? 'PARTIAL' : 'GAP';
+    const label = item.pct >= 80 ? 'ATTEINT' : item.pct >= 50 ? 'PARTIEL' : 'ECART';
     return `<div class="cyfun-item ${cls}">
       <span class="cyfun-name">${item.name}</span>
       <span class="cyfun-badge ${badge}">${label} ${item.pct}%</span>
@@ -1489,16 +1489,16 @@ function renderResults({ overallPct, nistPcts, basicPct, importantPct, essential
   const uniqueWeak = [...new Set(weakDomains)].slice(0, 2);
   const uniqueStrong = [...new Set(strongDomains)].slice(0, 2);
 
-  uniqueCritical.forEach(d => findings.push({ type: 'critical', tag: 'CRITICAL GAP', text: `${d}: No or minimal implementation detected. Immediate remediation required to achieve NIS2 compliance.` }));
-  uniqueWeak.forEach(d => findings.push({ type: 'warning', tag: 'IMPROVEMENT NEEDED', text: `${d}: Partial implementation. Documentation and consistent application required.` }));
-  uniqueStrong.forEach(d => findings.push({ type: 'info', tag: 'STRENGTH', text: `${d}: Good maturity level observed. Maintain and monitor.` }));
+  uniqueCritical.forEach(d => findings.push({ type: 'critical', tag: 'CRITICAL ECART', text: `${d}: No or minimal implementation detected. Immediate remediation required to achieve NIS2 compliance.` }));
+  uniqueWeak.forEach(d => findings.push({ type: 'warning', tag: 'AMELIORATION REQUISE', text: `${d}: Partial implementation. Documentation and consistent application required.` }));
+  uniqueStrong.forEach(d => findings.push({ type: 'info', tag: 'POINT FORT', text: `${d}: Good maturity level observed. Maintain and monitor.` }));
 
   findingsEl.innerHTML = findings.map(f => `
     <div class="finding-item finding-${f.type}">
       <div class="finding-tag">${f.tag}</div>
       ${f.text}
     </div>
-  `).join('') || '<div style="color:var(--text-muted); font-size:14px">No specific findings generated.</div>';
+  `).join('') || '<div style="color:var(--text-muted); font-size:14px">Aucun constat specifique genere.</div>';
 
   // Summary
   document.getElementById('full-assessment-text').textContent = summaryText;
@@ -1526,7 +1526,7 @@ function getNistAnswers(fn) {
 
 async function exportCCB() {
   const btn = document.getElementById('btn-export');
-  btn.textContent = 'Generating...';
+  btn.textContent = 'Generation...';
   btn.disabled = true;
 
   try {
@@ -1543,7 +1543,7 @@ async function exportCCB() {
       const labels = {1:'No process in place.',2:'Ad-hoc, informal process.',3:'Documented but not fully applied.',4:'Managed and monitored.'};
       const answers = state.answers.filter(a => a.nist_function === fn);
       const domains = [...new Set(answers.map(a => a.domain))].join(', ');
-      return `Maturity level ${score}/5. ${labels[score]||''} ${domains ? 'Domains assessed: '+domains+'.' : ''}`.trim();
+      return `Maturite level ${score}/5. ${labels[score]||''} ${domains ? 'Domains assessed: '+domains+'.' : ''}`.trim();
     }
     function getRec(score) {
       if (score <= 1) return 'Immediate action required. Define and document processes. Assign ownership.';
@@ -1597,7 +1597,7 @@ async function exportCCB() {
   } catch(e) {
     alert('Export error: ' + e.message);
   } finally {
-    btn.textContent = 'Export CCB Self-Assessment';
+    btn.textContent = 'Exporter l'auto-evaluation CCB';
     btn.disabled = false;
   }
 }
