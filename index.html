@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audit Studio - Audit de Conformite</title>
+<title>Audit Studio - Audit de Conformite IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1109,6 +1109,14 @@
     <div class="full-assessment-body" id="full-assessment-text">Generation...</div>
   </div>
 
+  <div class="result-card" style="margin-top:20px" id="risks-card" style="display:none">
+    <div class="result-card-header">Risques prioritaires - <span id="risks-sector"></span></div>
+    <div class="result-card-body">
+      <div id="risks-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-muted);font-style:italic">Source : Risk Studio - ONE CIRCLE IT SOLUTIONS</div>
+    </div>
+  </div>
+
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px">
     <button class="btn-export" id="btn-export" onclick="exportCCB()">⬇ Exporter l'auto-evaluation CCB</button>
     <button class="btn-restart" onclick="restartAudit()">↩ Nouvel audit</button>
@@ -1223,7 +1231,8 @@ async function startAudit() {
     answers: [],
     nistScores: { IDENTIFY: [], PROTECT: [], DETECT: [], RESPOND: [], RECOVER: [] },
     currentQuestion: null,
-    isComplete: false
+    isComplete: false,
+    risks: []
   };
 
   showLoading('Initialisation de la session d'audit IA...');
@@ -1416,7 +1425,8 @@ Use clear, direct language appropriate for a CISO or executive audience.`;
       answers: state.answers,
       nistScores: state.nistScores
     });
-    summaryText = res.summary || 'Error generating summary.';
+    summaryText = res.summary || 'Erreur de generation du resume.';
+    if (res.risks && res.risks.length > 0) state.risks = res.risks;
   } catch(e) {
     summaryText = 'Erreur de generation du resume. Veuillez consulter les scores ci-dessus.';
   }
@@ -1502,6 +1512,27 @@ function renderResults({ overallPct, nistPcts, basicPct, importantPct, essential
 
   // Summary
   document.getElementById('full-assessment-text').textContent = summaryText;
+
+  // Render risks from Risk Studio
+  if (state.risks && state.risks.length > 0) {
+    const risksCard = document.getElementById('risks-card');
+    risksCard.style.display = 'block';
+    document.getElementById('risks-sector').textContent = state.sector;
+    const severityColors = { high: '#dc2626', critical: '#dc2626', medium: '#ca8a04', low: '#16a34a' };
+    const severityLabels = { high: 'ELEVE', critical: 'CRITIQUE', medium: 'MOYEN', low: 'FAIBLE' };
+    document.getElementById('risks-list').innerHTML = state.risks.map(r => {
+      const sev = (r.severity || 'medium').toLowerCase();
+      const color = severityColors[sev] || '#ca8a04';
+      const label = severityLabels[sev] || sev.toUpperCase();
+      return '<div style="padding:12px 14px;border-radius:8px;border-left:4px solid ' + color + ';background:#f9f9f9">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
+        + '<span style="font-weight:600;font-size:14px;color:var(--text)">' + (r.title || r.name || 'Risque') + '</span>'
+        + '<span style="font-family:DM Mono,monospace;font-size:11px;font-weight:600;color:' + color + ';background:' + color + '18;padding:2px 8px;border-radius:4px">' + label + '</span>'
+        + '</div>'
+        + (r.description ? '<div style="font-size:13px;color:var(--text-muted);line-height:1.5">' + r.description + '</div>' : '')
+        + '</div>';
+    }).join('');
+  }
 }
 
 // ── EXPORT CCB SELF-ASSESSMENT ───────────────────────────────────────────
