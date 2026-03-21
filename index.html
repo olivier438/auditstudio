@@ -1277,10 +1277,10 @@ function renderQuestion(q) {
     measuresEl.style.display = q.cyfun_measures ? 'block' : 'none';
   }
 
-  // NIST tag
+  // NIST tag + bloc progress
   const tag = document.getElementById('nist-tag-display');
-  tag.textContent = q.nist_function;
-  tag.className = `nist-tag nist-${q.nist_function}`;
+  tag.textContent = q.progress_label || q.nist_function;
+  tag.className = 'nist-tag nist-' + (q.nist_function || 'IDENTIFY');
 
   // Progress
   const estimated_total = state.questionNumber + (q.estimated_remaining || 15);
