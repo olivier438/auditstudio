@@ -1418,11 +1418,19 @@ async function callWorker(endpoint, body, retries = 3) {
 
 // ── START AUDIT ───────────────────────────────────────────────────────────
 async function goToConfirm() {
-  // Populate confirm screen with form values
-  document.getElementById('cOrg').textContent = state.org || '—';
-  document.getElementById('cSector').textContent = state.sector || '—';
+  // Read form values now (state not yet populated)
+  const org = document.getElementById('org-name').value.trim() || 'Confidentiel';
+  const sector = document.getElementById('org-sector').value;
+  const size = document.getElementById('org-size').value;
+  // Pre-populate state so confirm screen and audit have the same values
+  state.org = org;
+  state.sector = sector;
+  state.size = size;
+
+  document.getElementById('cOrg').textContent = org || '—';
+  document.getElementById('cSector').textContent = sector || '—';
   const sizeMap = { small: '< 50 employés', medium: '50 - 250 employés', large: '> 250 employés' };
-  document.getElementById('cSize').textContent = sizeMap[state.size] || state.size || '—';
+  document.getElementById('cSize').textContent = sizeMap[size] || size || '—';
 
   showScreen('screen-confirm');
 
