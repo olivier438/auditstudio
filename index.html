@@ -241,6 +241,121 @@
   .btn-start:active { transform: translateY(0); }
   .btn-start:disabled { background: var(--text-light); cursor: not-allowed; transform: none; box-shadow: none; }
 
+  /* ── CONFIRMATION SCREEN ── */
+  .confirm-screen {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 24px 0;
+  }
+  .confirm-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .confirm-title em { color: var(--orange); font-style: italic; }
+  .confirm-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .confirm-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    margin-bottom: 14px;
+  }
+  .confirm-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .confirm-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+  }
+  .confirm-row:last-child { border-bottom: none; }
+  .confirm-row-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+  .confirm-row-label { color: var(--text-muted); min-width: 130px; }
+  .confirm-row-value { font-weight: 600; color: var(--navy); }
+  .confirm-risks-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--orange);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .confirm-risks-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .confirm-risks-error {
+    font-size: 13px;
+    color: #ca8a04;
+  }
+  .confirm-scope {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .confirm-scope-tag {
+    font-size: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+  .confirm-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .btn-confirm-back {
+    flex: 0 0 auto;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-confirm-back:hover { background: var(--bg); }
+  .btn-confirm-go {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background: var(--orange);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .btn-confirm-go:hover { background: var(--orange-light); transform: translateY(-1px); }
+  .btn-confirm-go:disabled { background: var(--text-light); cursor: not-allowed; transform: none; }
+
   /* ── AUDIT SCREEN ── */
   #screen-audit {
     max-width: 900px;
@@ -964,8 +1079,86 @@
           <div class="lbl">Fonctions NIST</div>
         </div>
       </div>
-      <button class="btn-start" id="btn-start" onclick="startAudit()">
+      <button class="btn-start" id="btn-start" onclick="goToConfirm()">
         Demarrer l'audit IA →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 1b: Confirmation -->
+<div class="screen" id="screen-confirm">
+  <div class="confirm-screen">
+    <h2 class="confirm-title">Prêt à démarrer<br><em>votre audit ?</em></h2>
+    <p class="confirm-subtitle">Vérifiez le récapitulatif ci-dessous avant de lancer la session.</p>
+
+    <div class="confirm-card">
+      <div class="confirm-card-label">Organisation</div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">🏢</span>
+        <span class="confirm-row-label">Entité</span>
+        <span class="confirm-row-value" id="cOrg">—</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">🏭</span>
+        <span class="confirm-row-label">Secteur</span>
+        <span class="confirm-row-value" id="cSector">—</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">👥</span>
+        <span class="confirm-row-label">Taille</span>
+        <span class="confirm-row-value" id="cSize">—</span>
+      </div>
+    </div>
+
+    <div class="confirm-card">
+      <div class="confirm-card-label">Périmètre d'audit</div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">📋</span>
+        <span class="confirm-row-label">Référentiel</span>
+        <span class="confirm-row-value">NIS2 · CyFun Essential</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">🎯</span>
+        <span class="confirm-row-label">Niveau cible</span>
+        <span class="confirm-row-value">Essential (218 exigences)</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">❓</span>
+        <span class="confirm-row-label">Questions estimées</span>
+        <span class="confirm-row-value">13 à 25 questions adaptatives</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">🧭</span>
+        <span class="confirm-row-label">Fonctions NIST couvertes</span>
+        <div class="confirm-scope">
+          <span class="confirm-scope-tag">IDENTIFY</span>
+          <span class="confirm-scope-tag">PROTECT</span>
+          <span class="confirm-scope-tag">DETECT</span>
+          <span class="confirm-scope-tag">RESPOND</span>
+          <span class="confirm-scope-tag">RECOVER</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirm-card">
+      <div class="confirm-card-label">Intelligence sectorielle</div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">⚡</span>
+        <span class="confirm-row-label">Risques Risk Studio</span>
+        <span id="cRisksStatus"><span class="confirm-risks-loading">⏳ Chargement...</span></span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-row-icon">🤖</span>
+        <span class="confirm-row-label">Moteur IA</span>
+        <span class="confirm-row-value">Groq · llama-3.1-8b-instant</span>
+      </div>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="btn-confirm-back" onclick="showScreen('screen-welcome')">← Modifier</button>
+      <button class="btn-confirm-go" id="btn-confirm-go" onclick="launchAudit()">
+        🚀 Lancer l'audit
       </button>
     </div>
   </div>
@@ -1218,6 +1411,44 @@ async function callWorker(endpoint, body, retries = 3) {
 
 
 // ── START AUDIT ───────────────────────────────────────────────────────────
+async function goToConfirm() {
+  // Populate confirm screen with form values
+  document.getElementById('cOrg').textContent = state.org || '—';
+  document.getElementById('cSector').textContent = state.sector || '—';
+  const sizeMap = { small: '< 50 employés', medium: '50 - 250 employés', large: '> 250 employés' };
+  document.getElementById('cSize').textContent = sizeMap[state.size] || state.size || '—';
+
+  showScreen('screen-confirm');
+
+  // Pre-fetch risks count from Risk Studio
+  const statusEl = document.getElementById('cRisksStatus');
+  try {
+    const res = await fetch(WORKER_URL + '/api/risks-count', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sector: state.sector })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const count = data.count || 0;
+      if (count > 0) {
+        statusEl.innerHTML = '<span class="confirm-risks-badge">✓ ' + count + ' risques chargés</span>';
+      } else {
+        statusEl.innerHTML = '<span class="confirm-risks-error">⚠ Aucun risque trouvé pour ce secteur</span>';
+      }
+    } else {
+      statusEl.innerHTML = '<span class="confirm-risks-error">⚠ Risk Studio non disponible</span>';
+    }
+  } catch(e) {
+    statusEl.innerHTML = '<span class="confirm-risks-error">⚠ Risk Studio non disponible</span>';
+  }
+}
+
+async function launchAudit() {
+  document.getElementById('btn-confirm-go').disabled = true;
+  await startAudit();
+}
+
 async function startAudit() {
   const org = document.getElementById('org-name').value.trim();
   const sector = document.getElementById('org-sector').value;
