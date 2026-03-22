@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audit Studio - Audit de Conformite</title>
+<title>Audit Studio - Audit de Conformite IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -996,7 +996,7 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -1063,7 +1063,7 @@
       <div class="form-group">
         <label class="form-label">Taille de l'organisation</label>
         <select class="form-input form-select" id="org-size">
-          <option value="PME (< 250 employes)">SME (&lt; 250 employees)</option>
+          <option value="PME (< 250 employes)">PME (&lt; 250 employes)</option>
           <option value="Moyenne (250-1000)">Moyenne (250-1000)</option>
           <option value="Grande (1000+)">Grande (1000+)</option>
         </select>
@@ -1074,10 +1074,10 @@
           <div class="lbl">Exigences</div>
         </div>
         <div class="info-item">
-          <div class="val">20-46</div>
+          <div class="val">25-50</div>
           <div class="lbl">Questions IA</div>
       </div>
-      <div style="font-size:12px;color:var(--text-muted);text-align:center;grid-column:1/-1;margin-top:-4px">218 exigences couvertes via 20 a 46 questions adaptatives</div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;grid-column:1/-1;margin-top:-4px">218 exigences couvertes via 25 a 50 questions adaptatives</div>
       <div style="display:none">
         </div>
         <div class="info-item">
@@ -1132,7 +1132,7 @@
       <div class="confirm-row">
         <span class="confirm-row-icon">❓</span>
         <span class="confirm-row-label">Questions estimées</span>
-        <span class="confirm-row-value">25 à 52 questions adaptatives</span>
+        <span class="confirm-row-value">25 à 50 questions adaptatives</span>
       </div>
       <div class="confirm-row">
         <span class="confirm-row-icon">🧭</span>
@@ -1204,6 +1204,25 @@
         <div class="question-text" id="q-text">Chargement...</div>
         <div id="q-measures" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:12px;display:none"></div>
         <div class="answer-options" id="answer-options"></div>
+
+        <!-- ── ZONES AUDITEUR ── -->
+        <div class="audit-extras">
+          <div class="extra-block">
+            <div class="extra-block-header">💡 Recommandation <span class="badge-ia">IA</span></div>
+            <textarea class="extra-textarea reco reco-loading" id="reco-text" placeholder="Generation en cours..."></textarea>
+          </div>
+          <div class="extra-block">
+            <div class="extra-block-header">✏️ Commentaire de l'auditeur</div>
+            <textarea class="extra-textarea" id="comment-text" placeholder="Observations, contexte, elements de preuve..."></textarea>
+          </div>
+          <div class="extra-block">
+            <div class="extra-block-header">⚡ Risques associes - Risk Studio</div>
+            <div id="related-risks-list" class="related-risks-list">
+              <div class="no-risks">Chargement des risques...</div>
+            </div>
+          </div>
+        </div>
+
         <button class="btn-next" id="btn-next" disabled onclick="submitAnswer()">
           Question suivante →
         </button>
@@ -1417,6 +1436,57 @@ async function callWorker(endpoint, body, retries = 3) {
 
 
 // ── START AUDIT ───────────────────────────────────────────────────────────
+// ── SECTOR RISKS ──────────────────────────────────────────────────────────────
+async function fetchSectorRisks(sector) {
+  try {
+    const res = await fetch(WORKER_URL + '/api/risks-count', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sector })
+    });
+    if (!res.ok) return;
+    // Re-use the risks already fetched - fetch full list for display
+    const rsRes = await fetch(WORKER_URL + '/api/sector-risks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sector })
+    });
+    if (rsRes.ok) {
+      state.sectorRisks = await rsRes.json();
+    }
+  } catch(e) {}
+}
+
+function renderRelatedRisks(nistFunction) {
+  const el = document.getElementById('related-risks-list');
+  if (!el) return;
+  const risks = state.sectorRisks;
+  if (!risks || risks.length === 0) {
+    el.innerHTML = '<div class="no-risks">Aucun risque associe trouve pour ce secteur.</div>';
+    return;
+  }
+  const sevColor = { critical: '#7f1d1d', high: '#dc2626', medium: '#ca8a04', low: '#16a34a' };
+  el.innerHTML = risks.slice(0, 5).map(r => {
+    const sev = r.severity || 'medium';
+    const color = sevColor[sev] || '#ca8a04';
+    const title = (r.title || r.titre || 'Risque').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const desc = (r.description || r.menace || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return '<div class="related-risk-item ' + sev + '">'
+      + '<div><div class="related-risk-title">' + title + '</div>'
+      + '<div class="related-risk-desc">' + desc + '</div></div>'
+      + '</div>';
+  }).join('');
+}
+
+function updateRecoField(recommendation) {
+  const el = document.getElementById('reco-text');
+  if (!el) return;
+  el.classList.remove('reco-loading');
+  el.value = recommendation || '';
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
 async function goToConfirm() {
   // Read form values now (state not yet populated)
   const org = document.getElementById('org-name').value.trim() || 'Confidentiel';
@@ -1477,10 +1547,13 @@ async function startAudit() {
     nistScores: { IDENTIFY: [], PROTECT: [], DETECT: [], RESPOND: [], RECOVER: [] },
     currentQuestion: null,
     isComplete: false,
-    risks: []
+    risks: [],
+    sectorRisks: []
   };
 
   showLoading("Initialisation de la session d'audit IA...");
+  // Preload sector risks for display during audit
+  fetchSectorRisks(state.sector);
   try {
     // Create session in Supabase
     const sessionRes = await callWorker('/api/session', { org_name: org||null, sector, org_size: size });
@@ -1525,6 +1598,15 @@ function renderQuestion(q) {
   document.getElementById('q-num').textContent = qRef;
   document.getElementById('q-domain').textContent = q.domain || '';
   document.getElementById('q-text').textContent = q.question;
+  // Reset and fill extras
+  const recoEl = document.getElementById('reco-text');
+  if (recoEl) { recoEl.classList.add('reco-loading'); recoEl.value = 'Generation en cours...'; }
+  const commentEl = document.getElementById('comment-text');
+  if (commentEl) commentEl.value = '';
+  // Fill recommendation from server response
+  if (q.recommendation) updateRecoField(q.recommendation);
+  // Render related risks
+  renderRelatedRisks(q.nist_function);
   const measuresEl = document.getElementById('q-measures');
   if (measuresEl) {
     measuresEl.textContent = q.cyfun_measures ? 'CyFun: ' + q.cyfun_measures : '';
@@ -1544,7 +1626,11 @@ function renderQuestion(q) {
   document.getElementById('stat-remain').textContent = q.estimated_remaining || '~';
 
   // AI reasoning
-  document.getElementById('ai-reasoning').innerHTML = `<em>${q.reasoning}</em>`;
+  const reasoningEl = document.getElementById('ai-reasoning');
+  if (reasoningEl) {
+    reasoningEl.textContent = q.reasoning || '';
+    reasoningEl.style.fontStyle = 'italic';
+  }
   const skipEl = document.getElementById('ai-skip');
   if (q.skip_notice) {
     skipEl.style.display = 'block';
@@ -1596,13 +1682,19 @@ async function submitAnswer() {
   if (!state.selectedAnswer) return;
   const q = state.currentQuestion;
 
+  // Capture reco + commentaire before state changes
+  const recoVal = document.getElementById('reco-text')?.value || '';
+  const commentVal = document.getElementById('comment-text')?.value || '';
+
   state.answers.push({
     question_num: q.question_num || null,
     question: q.question,
     domain: q.domain,
     nist_function: q.nist_function,
     answer_text: state.selectedAnswer.text,
-    score: state.selectedAnswer.level
+    score: state.selectedAnswer.level,
+    recommendation: recoVal,
+    commentaire: commentVal,
   });
 
   state.nistScores[q.nist_function].push(state.selectedAnswer.level);
@@ -1610,7 +1702,7 @@ async function submitAnswer() {
   const lastAnswer = {
     question: q.question, domain: q.domain, nist_function: q.nist_function,
     answer_text: state.selectedAnswer.text, score: state.selectedAnswer.level,
-    reasoning: q.reasoning
+    reasoning: q.reasoning, recommendation: recoVal, commentaire: commentVal,
   };
   state.selectedAnswer = null;
 
@@ -1771,10 +1863,10 @@ function renderResults({ overallPct, nistPcts, basicPct, importantPct, essential
       const label = severityLabels[sev] || sev.toUpperCase();
       return '<div style="padding:12px 14px;border-radius:8px;border-left:4px solid ' + color + ';background:#f9f9f9">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
-        + '<span style="font-weight:600;font-size:14px;color:var(--text)">' + (r.title || r.name || 'Risque') + '</span>'
+        + '<span style="font-weight:600;font-size:14px;color:var(--text)">' + (r.title || r.name || 'Risque').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>'
         + '<span style="font-family:DM Mono,monospace;font-size:11px;font-weight:600;color:' + color + ';background:' + color + '18;padding:2px 8px;border-radius:4px">' + label + '</span>'
         + '</div>'
-        + (r.description ? '<div style="font-size:13px;color:var(--text-muted);line-height:1.5">' + r.description + '</div>' : '')
+        + (r.description ? '<div style="font-size:13px;color:var(--text-muted);line-height:1.5">' + r.description.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' : '')
         + '</div>';
     }).join('');
   }
