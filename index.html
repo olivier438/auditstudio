@@ -363,7 +363,7 @@
     padding: 32px 2rem;
     display: none;
   }
-  #screen-audit.active { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+  #screen-audit.active { display: flex; flex-direction: column; gap: 0; }
 
   /* Progress bar */
   .audit-progress {
@@ -432,7 +432,7 @@
   .nist-RECOVER  { background: #f3e8ff; color: #7e22ce; }
 
   /* Question card */
-  .question-col { display: flex; flex-direction: column; gap: 16px; }
+  .question-col { display: flex; flex-direction: column; gap: 16px; max-width: 860px; margin: 0 auto; width: 100%; }
 
   .question-card {
     background: var(--surface);
@@ -995,7 +995,500 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-</style>
+
+  /* ── AUDIT EXTRAS REDESIGN ─────────────────────────────────────────── */
+  .audit-extras {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Recommandation IA */
+  .extra-block.reco-block {
+    background: linear-gradient(135deg, #f0f5fb 0%, #e8f0fb 100%);
+    border: 1.5px solid #c5d8f5;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .extra-block.comment-block {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .extra-block.comment-block:focus-within {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(232,100,26,0.08);
+  }
+  .extra-block.risks-block {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .extra-block-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  .reco-block .extra-block-header { color: var(--navy); }
+  .comment-block .extra-block-header { color: var(--text-muted); border-bottom: 1px solid var(--border); }
+  .risks-block .extra-block-header {
+    background: var(--charcoal);
+    color: rgba(255,255,255,.65);
+    border-bottom: none;
+  }
+  .badge-ia {
+    background: var(--orange);
+    color: white;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .risks-source {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .extra-textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: 8px 13px 11px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text);
+    resize: none;
+    background: transparent;
+    box-sizing: border-box;
+  }
+  .extra-textarea:focus { outline: none; }
+  .extra-textarea.reco { color: var(--navy); font-style: italic; }
+  .extra-textarea.reco-loading { color: var(--text-muted); font-style: normal; }
+  .extra-textarea::placeholder { color: #bbb; }
+
+  /* Risk items */
+  .related-risks-list {
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 210px;
+    overflow-y: auto;
+  }
+  .related-risk-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: start;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    background: #fafafa;
+    border: 1px solid #eee;
+    transition: background .15s;
+  }
+  .related-risk-item:hover { background: #f4f7fc; }
+  .risk-sev-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .related-risk-item.critical .risk-sev-dot,
+  .related-risk-item.high .risk-sev-dot { background: #dc2626; }
+  .related-risk-item.medium .risk-sev-dot { background: #d97706; }
+  .related-risk-item.low .risk-sev-dot { background: #16a34a; }
+  .risk-content { min-width: 0; }
+  .related-risk-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .related-risk-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .risk-sev-badge {
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 5px;
+    border-radius: 3px;
+    letter-spacing: .04em;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .related-risk-item.critical .risk-sev-badge { background: #fef2f2; color: #b91c1c; }
+  .related-risk-item.high .risk-sev-badge { background: #fef2f2; color: #dc2626; }
+  .related-risk-item.medium .risk-sev-badge { background: #fffbeb; color: #d97706; }
+  .related-risk-item.low .risk-sev-badge { background: #f0fdf4; color: #16a34a; }
+  .no-risks {
+    padding: 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+  }
+
+  
+  /* ── AUDIT SCREEN REDESIGN ─────────────────────────────────────────── */
+
+  /* Top NIST bar */
+  .nist-top-bar {
+    background: var(--charcoal);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    flex-wrap: wrap;
+  }
+  .nist-top-bar-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: rgba(255,255,255,.4);
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .nist-fn-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+    color: rgba(255,255,255,.4);
+    letter-spacing: .04em;
+    transition: all .3s;
+  }
+  .nist-fn-pill.active {
+    background: rgba(240,180,0,.15);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .nist-fn-pill.done {
+    background: rgba(22,163,74,.12);
+    border-color: rgba(22,163,74,.4);
+    color: #4ade80;
+  }
+  .nist-fn-score {
+    font-size: 10px;
+    opacity: .7;
+  }
+
+  /* Question container - full width single col */
+  .audit-main {
+    max-width: 860px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 24px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Question card */
+  .question-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .question-header {
+    padding: 14px 20px;
+    background: var(--blue);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .question-body { padding: 24px; }
+  .question-text {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .q-measures-row {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  /* Answer options 1-5 */
+  .answer-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .answer-opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all .18s;
+    background: #fafafa;
+  }
+  .answer-opt:hover { border-color: var(--blue); background: #f0f5fb; }
+  .answer-opt.selected { border-color: var(--blue); background: #e8f0fb; }
+  .answer-opt input[type="radio"] { display: none; }
+  .opt-level-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    color: var(--text-muted);
+    transition: all .18s;
+  }
+  .answer-opt.selected .opt-level-num {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+  }
+  .opt-level-num.lv1 { border-color: #fca5a5; color: #dc2626; }
+  .opt-level-num.lv2 { border-color: #fdba74; color: #ea580c; }
+  .opt-level-num.lv3 { border-color: #fde047; color: #a16207; }
+  .opt-level-num.lv4 { border-color: #86efac; color: #16a34a; }
+  .opt-level-num.lv5 { border-color: #6ee7b7; color: #047857; }
+  .answer-opt.selected .opt-level-num.lv1,
+  .answer-opt.selected .opt-level-num.lv2,
+  .answer-opt.selected .opt-level-num.lv3,
+  .answer-opt.selected .opt-level-num.lv4,
+  .answer-opt.selected .opt-level-num.lv5 { background: var(--blue); border-color: var(--blue); color: white; }
+  .opt-text {
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--text);
+    flex: 1;
+  }
+  .opt-text strong { font-weight: 700; color: var(--navy); }
+
+  /* Raisonnement IA - inline */
+  .ai-reasoning-strip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f8faff;
+    border: 1px solid #dbe8f8;
+    border-radius: 9px;
+    margin-bottom: 0;
+  }
+  .ai-reasoning-strip .pulse-dot {
+    width: 7px; height: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: pulse 1.8s infinite;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .ai-reasoning-strip .ai-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--blue);
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+  .ai-reasoning-strip .ai-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    font-style: italic;
+    flex: 1;
+  }
+
+  /* Reco + Commentaire side by side */
+  .extras-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .extra-panel {
+    background: white;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .extra-panel.reco-panel {
+    background: linear-gradient(160deg, #f0f5fb, #e8f0fb);
+    border-color: #c5d8f5;
+  }
+  .extra-panel.comment-panel:focus-within {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(232,100,26,.07);
+  }
+  .extra-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 13px 7px;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    flex-shrink: 0;
+  }
+  .reco-panel .extra-panel-header { color: var(--navy); border-bottom-color: rgba(26,80,148,.1); }
+  .comment-panel .extra-panel-header { color: var(--text-muted); }
+  .extra-panel-header .badge-ia {
+    background: var(--orange);
+    color: white;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .extra-panel textarea {
+    flex: 1;
+    width: 100%;
+    min-height: 100px;
+    padding: 10px 13px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text);
+    resize: none;
+    background: transparent;
+    box-sizing: border-box;
+  }
+  .extra-panel textarea:focus { outline: none; }
+  .reco-panel textarea { color: var(--navy); font-style: italic; }
+  .reco-panel textarea.reco-loading { color: var(--text-muted); font-style: normal; }
+  .extra-panel textarea::placeholder { color: #c0c8d4; }
+
+  /* Risks panel full width */
+  .risks-panel {
+    background: white;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+  .risks-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--charcoal);
+  }
+  .risks-panel-header .rph-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: rgba(255,255,255,.6);
+    flex: 1;
+  }
+  .risks-panel-header .rph-source {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+    color: var(--gold);
+  }
+  .risks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+    padding: 12px;
+  }
+  .risk-card {
+    padding: 10px 12px;
+    border-radius: 7px;
+    background: #fafafa;
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background .15s;
+    cursor: default;
+  }
+  .risk-card:hover { background: #f3f6fc; }
+  .risk-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .risk-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    flex: 1;
+  }
+  .risk-sev-chip {
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    letter-spacing: .04em;
+  }
+  .risk-card.critical .risk-sev-chip { background: #fef2f2; color: #b91c1c; }
+  .risk-card.high .risk-sev-chip { background: #fff7ed; color: #c2410c; }
+  .risk-card.medium .risk-sev-chip { background: #fffbeb; color: #b45309; }
+  .risk-card.low .risk-sev-chip { background: #f0fdf4; color: #15803d; }
+  .risk-card-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .no-risks { padding: 16px; font-size: 12px; color: var(--text-muted); font-style: italic; text-align: center; }
+
+  </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -1172,7 +1665,18 @@
 
 <!-- SCREEN 2: Audit -->
 <div class="screen" id="screen-audit">
-  <!-- Progress -->
+
+  <!-- NIST top bar -->
+  <div class="nist-top-bar">
+    <span class="nist-top-bar-label">Progression NIST</span>
+    <div class="nist-fn-pill" id="nist-pill-IDENTIFY" data-fn="IDENTIFY">IDENTIFY <span class="nist-fn-score" id="nist-sc-IDENTIFY"></span></div>
+    <div class="nist-fn-pill" id="nist-pill-PROTECT" data-fn="PROTECT">PROTECT <span class="nist-fn-score" id="nist-sc-PROTECT"></span></div>
+    <div class="nist-fn-pill" id="nist-pill-DETECT" data-fn="DETECT">DETECT <span class="nist-fn-score" id="nist-sc-DETECT"></span></div>
+    <div class="nist-fn-pill" id="nist-pill-RESPOND" data-fn="RESPOND">RESPOND <span class="nist-fn-score" id="nist-sc-RESPOND"></span></div>
+    <div class="nist-fn-pill" id="nist-pill-RECOVER" data-fn="RECOVER">RECOVER <span class="nist-fn-score" id="nist-sc-RECOVER"></span></div>
+  </div>
+
+  <!-- Progress bar -->
   <div class="audit-progress">
     <div class="progress-info">
       <div class="progress-label">Progression de l'audit</div>
@@ -1193,8 +1697,10 @@
     </div>
   </div>
 
-  <!-- Question col -->
-  <div class="question-col">
+  <!-- Main audit form - single column full width -->
+  <div class="audit-main">
+
+    <!-- Question card -->
     <div class="question-card" id="question-card">
       <div class="question-header">
         <span class="question-num" id="q-num">Q01</span>
@@ -1202,63 +1708,54 @@
       </div>
       <div class="question-body">
         <div class="question-text" id="q-text">Chargement...</div>
-        <div id="q-measures" style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:12px;display:none"></div>
+        <div id="q-measures" class="q-measures-row" style="display:none"></div>
+
+        <!-- AI reasoning inline -->
+        <div class="ai-reasoning-strip" id="ai-reasoning-strip" style="margin-bottom:18px">
+          <div class="pulse-dot"></div>
+          <span class="ai-label">IA</span>
+          <span class="ai-text" id="ai-reasoning">Analyse en cours...</span>
+          <div class="ai-skip-notice" id="ai-skip" style="display:none"></div>
+        </div>
+
+        <!-- Answer options 1-5 -->
         <div class="answer-options" id="answer-options"></div>
 
-        <!-- ── ZONES AUDITEUR ── -->
-        <div class="audit-extras">
-          <div class="extra-block">
-            <div class="extra-block-header">💡 Recommandation <span class="badge-ia">IA</span></div>
-            <textarea class="extra-textarea reco reco-loading" id="reco-text" placeholder="Generation en cours..."></textarea>
+        <!-- Reco + Commentaire -->
+        <div class="extras-grid">
+          <div class="extra-panel reco-panel">
+            <div class="extra-panel-header">💡 Recommandation <span class="badge-ia">IA</span></div>
+            <textarea class="reco reco-loading" id="reco-text" placeholder="Generation en cours..."></textarea>
           </div>
-          <div class="extra-block">
-            <div class="extra-block-header">✏️ Commentaire de l'auditeur</div>
-            <textarea class="extra-textarea" id="comment-text" placeholder="Observations, contexte, elements de preuve..."></textarea>
-          </div>
-          <div class="extra-block">
-            <div class="extra-block-header">⚡ Risques associes - Risk Studio</div>
-            <div id="related-risks-list" class="related-risks-list">
-              <div class="no-risks">Chargement des risques...</div>
-            </div>
+          <div class="extra-panel comment-panel">
+            <div class="extra-panel-header">✏️ Commentaire de l'auditeur</div>
+            <textarea id="comment-text" placeholder="Observations, contexte, elements de preuve observes lors de l'audit..."></textarea>
           </div>
         </div>
 
-        <button class="btn-next" id="btn-next" disabled onclick="submitAnswer()">
-          Question suivante →
+        <!-- Risques Risk Studio -->
+        <div class="risks-panel" style="margin-top:12px">
+          <div class="risks-panel-header">
+            <span class="rph-label">⚡ Risques associes au secteur</span>
+            <span class="rph-source">Risk Studio</span>
+          </div>
+          <div id="related-risks-list" class="risks-grid">
+            <div class="no-risks">Chargement des risques...</div>
+          </div>
+        </div>
+
+        <button class="btn-next" id="btn-next" disabled onclick="submitAnswer()" style="margin-top:20px">
+          Valider et question suivante →
         </button>
       </div>
     </div>
 
+    <!-- History (hidden by default) -->
     <div class="audit-history" id="audit-history" style="display:none">
       <div class="audit-history-title">Questions repondues</div>
       <div id="history-items"></div>
     </div>
-  </div>
 
-  <!-- AI panel -->
-  <div class="ai-panel">
-    <div class="ai-thinking">
-      <div class="ai-thinking-header">
-        <div class="ai-pulse"></div>
-        <span>Raisonnement IA</span>
-      </div>
-      <div class="ai-thinking-body">
-        <div class="ai-reasoning" id="ai-reasoning">
-          <div class="ai-reasoning loading">
-            <div class="ai-dots">
-              <span></span><span></span><span></span>
-            </div>
-            L'IA analyse le contexte...
-          </div>
-        </div>
-        <div class="ai-skip-notice" id="ai-skip" style="display:none"></div>
-      </div>
-    </div>
-
-    <div class="score-tracker">
-      <div class="score-tracker-title">Score en temps reel par fonction NIST</div>
-      <div class="nist-scores" id="nist-scores"></div>
-    </div>
   </div>
 </div>
 
@@ -1397,6 +1894,24 @@ function initNistScores() {
   `).join('');
 }
 
+function updateNistTopBar() {
+  const fns = ['IDENTIFY','PROTECT','DETECT','RESPOND','RECOVER'];
+  const currentFn = state.currentQuestion ? state.currentQuestion.nist_function : null;
+  fns.forEach(fn => {
+    const pill = document.getElementById('nist-pill-' + fn);
+    const sc = document.getElementById('nist-sc-' + fn);
+    if (!pill) return;
+    const scores = state.nistScores[fn] || [];
+    pill.classList.remove('active','done');
+    if (fn === currentFn) pill.classList.add('active');
+    else if (scores.length > 0) pill.classList.add('done');
+    if (sc && scores.length > 0) {
+      const avg = scores.reduce((a,b)=>a+b,0)/scores.length;
+      sc.textContent = avg.toFixed(1);
+    }
+  });
+}
+
 function updateNistScores() {
   Object.entries(state.nistScores).forEach(([fn, scores]) => {
     const el_val = document.getElementById(`ns-val-${fn}`);
@@ -1466,14 +1981,15 @@ function renderRelatedRisks(nistFunction) {
     return;
   }
   const sevColor = { critical: '#7f1d1d', high: '#dc2626', medium: '#ca8a04', low: '#16a34a' };
-  el.innerHTML = risks.slice(0, 5).map(r => {
+  const sevChip = { critical:'CRITIQUE', high:'ÉLEVÉ', medium:'MOYEN', low:'FAIBLE' };
+  el.innerHTML = risks.slice(0, 12).map(r => {
     const sev = r.severity || 'medium';
-    const color = sevColor[sev] || '#ca8a04';
     const title = (r.title || r.titre || 'Risque').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const desc = (r.description || r.menace || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return '<div class="related-risk-item ' + sev + '">'
-      + '<div><div class="related-risk-title">' + title + '</div>'
-      + '<div class="related-risk-desc">' + desc + '</div></div>'
+    return '<div class="risk-card ' + sev + '">'
+      + '<div class="risk-card-top"><div class="risk-card-title">' + title + '</div>'
+      + '<span class="risk-sev-chip">' + (sevChip[sev]||sev) + '</span></div>'
+      + (desc ? '<div class="risk-card-desc">' + desc + '</div>' : '')
       + '</div>';
   }).join('');
 }
@@ -1598,6 +2114,7 @@ function renderQuestion(q) {
   document.getElementById('q-num').textContent = qRef;
   document.getElementById('q-domain').textContent = q.domain || '';
   document.getElementById('q-text').textContent = q.question;
+  updateNistTopBar();
   // Reset and fill extras
   const recoEl = document.getElementById('reco-text');
   if (recoEl) { recoEl.classList.add('reco-loading'); recoEl.value = 'Generation en cours...'; }
@@ -1628,24 +2145,22 @@ function renderQuestion(q) {
   // AI reasoning
   const reasoningEl = document.getElementById('ai-reasoning');
   if (reasoningEl) {
-    reasoningEl.textContent = q.reasoning || '';
-    reasoningEl.style.fontStyle = 'italic';
+    reasoningEl.textContent = q.reasoning || 'Analyse adaptative en cours...';
   }
   const skipEl = document.getElementById('ai-skip');
-  if (q.skip_notice) {
-    skipEl.style.display = 'block';
-    skipEl.textContent = '⤵ ' + q.skip_notice;
-  } else {
-    skipEl.style.display = 'none';
+  if (skipEl) {
+    skipEl.style.display = q.skip_notice ? 'block' : 'none';
+    if (q.skip_notice) skipEl.textContent = '⤵ ' + q.skip_notice;
   }
+
 
   // Options
   const optContainer = document.getElementById('answer-options');
+    const levelNames = {1:'Initial',2:'Reproductible',3:'Defini',4:'Gere',5:'Optimise'};
   optContainer.innerHTML = q.options.map((opt, i) => `
     <div class="answer-opt" id="opt-${i}" data-idx="${i}" data-level="${opt.level}" data-text="${opt.text.replace(/"/g,'&quot;')}">
-      <div class="opt-indicator" id="opt-ind-${i}"></div>
-      <div class="opt-level level-${opt.level}">L${opt.level}</div>
-      <div class="opt-text">${opt.text}</div>
+      <div class="opt-level-num lv${opt.level}">${opt.level}</div>
+      <div class="opt-text"><strong>${levelNames[opt.level] || 'L'+opt.level}</strong> — ${opt.text}</div>
     </div>
   `).join('');
 
@@ -1699,6 +2214,7 @@ async function submitAnswer() {
 
   state.nistScores[q.nist_function].push(state.selectedAnswer.level);
   updateNistScores();
+  updateNistTopBar();
   const lastAnswer = {
     question: q.question, domain: q.domain, nist_function: q.nist_function,
     answer_text: state.selectedAnswer.text, score: state.selectedAnswer.level,
