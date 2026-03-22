@@ -194,6 +194,8 @@
     <div class="nist-fn-pill" id="nist-pill-RESPOND" data-fn="RESPOND">RESPOND <span class="nist-fn-score" id="nist-sc-RESPOND"></span></div>
     <div class="nist-fn-pill" id="nist-pill-RECOVER" data-fn="RECOVER">RECOVER <span class="nist-fn-score" id="nist-sc-RECOVER"></span></div>
   </div>
+  <!-- Hidden nist-scores container for backward compat -->
+  <div id="nist-scores" style="display:none"></div>
 
   <!-- Progress bar -->
   <div class="audit-progress">
@@ -400,6 +402,7 @@ const NIST_COLORS = {
 
 function initNistScores() {
   const container = document.getElementById('nist-scores');
+  if (!container) return;
   container.innerHTML = Object.keys(NIST_COLORS).map(fn => `
     <div class="nist-score-item">
       <div class="nist-score-label">
@@ -1029,10 +1032,7 @@ document.getElementById('org-sector').addEventListener('change', () => {
   const ok = document.getElementById('org-sector').value;
   document.getElementById('btn-start').disabled = !ok;
 });
-document.getElementById('groq-api-key').addEventListener('input', () => {
-  const ok = document.getElementById('org-sector').value;
-  document.getElementById('btn-start').disabled = !ok;
-});
+
 document.getElementById('btn-start').disabled = true;
 </script>
 </body>
