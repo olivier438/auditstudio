@@ -242,15 +242,15 @@
         <!-- Answer options 1-5 -->
         <div class="answer-options" id="answer-options"></div>
 
-        <!-- Reco + Commentaire -->
-        <div class="extras-grid">
-          <div class="extra-panel reco-panel">
-            <div class="extra-panel-header">💡 Recommandation <span class="badge-ia">IA</span></div>
-            <textarea class="reco reco-loading" id="reco-text" placeholder="Generation en cours..."></textarea>
-          </div>
+        <!-- Commentaire (full width, first) + Reco (full width, below) -->
+        <div class="extras-stack">
           <div class="extra-panel comment-panel">
             <div class="extra-panel-header">✏️ Commentaire de l'auditeur</div>
             <textarea id="comment-text" placeholder="Observations, contexte, elements de preuve observes lors de l'audit..."></textarea>
+          </div>
+          <div class="extra-panel reco-panel">
+            <div class="extra-panel-header">💡 Recommandation <span class="badge-ia">IA</span></div>
+            <textarea class="reco reco-loading" id="reco-text" placeholder="Generation en cours..."></textarea>
           </div>
         </div>
 
